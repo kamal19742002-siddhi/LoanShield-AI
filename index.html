@@ -2,64 +2,414 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LoanShield AI</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #f3f6fb;
-      color: #172033;
-    }
-    main {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-    }
-    input, button {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      font-size: 16px;
-    }
-    button {
-      background: #174ea6;
-      color: white;
-      border: 0;
-      border-radius: 8px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>LoanShield AI</title>
+
+<style>
+:root {
+  --bg: #f3f6fb;
+  --card: #ffffff;
+  --text: #172033;
+  --muted: #657187;
+  --primary: #245eea;
+  --border: #e1e7f0;
+}
+body.dark {
+  --bg: #101827;
+  --card: #1b2638;
+  --text: #f2f5fb;
+  --muted: #b3bfd1;
+  --primary: #78a0ff;
+  --border: #344155;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: .2s;
+}
+header {
+  background: #14264a;
+  color: white;
+  padding: 20px 16px;
+}
+.top {
+  max-width: 850px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.brand { font-size: 22px; font-weight: 800; }
+.brand span { color: #75a2ff; }
+button, select, input, textarea {
+  font: inherit;
+  border-radius: 10px;
+}
+button {
+  border: 0;
+  padding: 11px 14px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.lang, .theme {
+  background: #263c63;
+  color: white;
+}
+main {
+  max-width: 850px;
+  padding: 20px 14px 45px;
+  margin: auto;
+}
+.hero {
+  background: linear-gradient(135deg, #1b4fc4, #673bd2);
+  color: white;
+  border-radius: 18px;
+  padding: 25px 20px;
+  margin-bottom: 18px;
+}
+.hero h1 { margin: 0 0 10px; font-size: 27px; }
+.hero p { line-height: 1.55; margin-bottom: 0; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 19px;
+  margin: 15px 0;
+}
+h2 { font-size: 19px; margin: 0 0 13px; }
+label {
+  display: block;
+  font-weight: 700;
+  margin: 14px 0 7px;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+textarea { min-height: 90px; resize: vertical; }
+.primary {
+  width: 100%;
+  margin-top: 15px;
+  background: var(--primary);
+  color: white;
+}
+.secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tile {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: var(--bg);
+}
+.tile h3 { margin: 0 0 8px; font-size: 16px; }
+.tile p { color: var(--muted); line-height: 1.5; margin: 0; }
+#result { display: none; }
+.score {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 8px 0;
+}
+.note { color: var(--muted); font-size: 13px; line-height: 1.5; }
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 10px 15px 28px;
+}
+ul { padding-left: 20px; line-height: 1.8; }
+@media(max-width: 520px) {
+  .grid { grid-template-columns: 1fr; }
+  .brand { font-size: 19px; }
+  .hero h1 { font-size: 24px; }
+}
+</style>
 </head>
+
 <body>
-  <main>
-    <h1>LoanShield AI</h1>
-    <p>Check your loan offer for basic warning signs.</p>
-    <label for="rate">Annual interest rate (%)</label>
-    <input id="rate" type="number" min="0" max="200" step="0.1"
-           placeholder="Enter interest rate">
-    <button onclick="checkLoan()">Check Loan</button>
-    <p id="result" aria-live="polite"></p>
-    <p><small>This is a basic educational check, not financial advice.</small></p>
-  </main>
-  <script>
-    function checkLoan() {
-      const rate = Number(document.getElementById('rate').value);
-      const result = document.getElementById('result');
-      if (document.getElementById('rate').value.trim() === '' ||
-          !Number.isFinite(rate) || rate < 0 || rate > 200) {
-        result.textContent = 'Enter a valid interest rate between 0 and 200%.';
-      } else if (rate > 36) {
-        result.textContent = 'Warning: this is a very high interest rate. Check all terms and fees carefully.';
-      } else if (rate > 18) {
-        result.textContent = 'Caution: compare other offers and check the total repayment and fees.';
-      } else {
-        result.textContent = 'Check the lender, fees, repayment schedule and loan agreement before accepting.';
-      }
-    }
-  </script>
+<header>
+  <div class="top">
+    <div class="brand">🛡️ LoanShield <span>AI</span></div>
+    <div style="display:flex;gap:7px">
+      <button class="lang" id="langBtn" onclick="toggleLanguage()">हिंदी</button>
+      <button class="theme" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1 id="heroTitle">Protect Yourself Before Taking a Loan</h1>
+    <p id="heroText">Review loan offers, identify warning signs, and make a more informed borrowing decision.</p>
+  </section>
+
+  <section class="card">
+    <h2 id="reviewTitle">🔎 Review a Loan Offer</h2>
+
+    <label id="companyLabel" for="company">Bank / Lender Name</label>
+    <input id="company" placeholder="Enter bank or lending app name">
+
+    <label id="offerLabel" for="offer">Loan Offer Details</label>
+    <textarea id="offer" placeholder="Paste the offer message or describe the loan terms, fees, and conditions. Do not include passwords, OTPs, or account numbers."></textarea>
+
+    <label id="feeLabel" for="fees">Are fees or charges clearly explained?</label>
+    <select id="fees">
+      <option value="unknown">Not sure</option>
+      <option value="yes">Yes, clearly explained</option>
+      <option value="no">No, unclear or hidden</option>
+    </select>
+
+    <label id="regLabel" for="lender">Lender verification</label>
+    <select id="lender">
+      <option value="unknown">Not verified</option>
+      <option value="verified">Verified through official sources</option>
+      <option value="unverified">Cannot verify / suspicious</option>
+    </select>
+
+    <label id="advanceLabel" for="advance">Is advance payment demanded before loan disbursal?</label>
+    <select id="advance">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+      <option value="unknown">Not sure</option>
+    </select>
+
+    <button class="primary" onclick="reviewOffer()" id="reviewBtn">Check Loan Safety</button>
+    <p class="note" id="privacyNote">Review is a preliminary checklist, not a verified fraud detection service or financial advice. Avoid entering personal or confidential information.</p>
+  </section>
+
+  <section class="card" id="result" aria-live="polite">
+    <h2 id="resultTitle">Your Preliminary Review</h2>
+    <div class="score" id="score">—</div>
+    <p id="scoreLabel"></p>
+    <h3 id="redTitle">🚩 Warning Signs</h3>
+    <ul id="redList"></ul>
+    <h3 id="greenTitle">✅ Safer Steps</h3>
+    <ul id="greenList"></ul>
+    <button class="secondary" onclick="shareReport()" id="shareBtn">Share Report on WhatsApp</button>
+  </section>
+
+  <section class="grid">
+    <div class="tile">
+      <h3 id="redCardTitle">🚩 Red Flags</h3>
+      <p id="redCardText">Be cautious of upfront fees, pressure tactics, unclear terms, and requests for OTPs or PINs.</p>
+    </div>
+    <div class="tile">
+      <h3 id="greenCardTitle">🟢 Safer Borrowing</h3>
+      <p id="greenCardText">Verify the lender independently, read all terms, and keep copies of documents and communications.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 id="stepsTitle">🛡️ Before You Accept a Loan</h2>
+    <ul id="stepsList">
+      <li>Verify the lender using official regulator or bank sources.</li>
+      <li>Read the complete loan agreement and all applicable fees.</li>
+      <li>Never share an OTP, PIN, or banking password.</li>
+      <li>Do not pay suspicious advance fees to release a loan.</li>
+      <li>Contact your bank or local cybercrime authorities if you suspect fraud.</li>
+    </ul>
+  </section>
+</main>
+
+<footer id="footerText">
+  LoanShield AI · Awareness and preliminary checks only. No review can guarantee that a loan offer is safe.
+</footer>
+
+<script>
+let hindi = false;
+let lastReport = "";
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+}
+
+const translations = {
+  heroTitle: ["Protect Yourself Before Taking a Loan", "लोन लेने से पहले खुद को सुरक्षित रखें"],
+  heroText: [
+    "Review loan offers, identify warning signs, and make a more informed borrowing decision.",
+    "लोन ऑफर की जाँच करें, खतरे के संकेत पहचानें और सोच-समझकर निर्णय लें।"
+  ],
+  reviewTitle: ["🔎 Review a Loan Offer", "🔎 लोन ऑफर की जाँच करें"],
+  companyLabel: ["Bank / Lender Name", "बैंक / लेंडर का नाम"],
+  offerLabel: ["Loan Offer Details", "लोन ऑफर की जानकारी"],
+  feeLabel: ["Are fees or charges clearly explained?", "क्या फीस और चार्ज स्पष्ट बताए गए हैं?"],
+  regLabel: ["Lender verification", "लेंडर की जाँच"],
+  advanceLabel: ["Is advance payment demanded before loan disbursal?", "क्या लोन मिलने से पहले पैसे माँगे जा रहे हैं?"],
+  reviewBtn: ["Check Loan Safety", "लोन की सुरक्षा जाँचें"],
+  privacyNote: [
+    "Review is a preliminary checklist, not a verified fraud detection service or financial advice. Avoid entering personal or confidential information.",
+    "यह शुरुआती जाँच है, प्रमाणित फ्रॉड डिटेक्शन सेवा या वित्तीय सलाह नहीं। निजी जानकारी न डालें।"
+  ],
+  resultTitle: ["Your Preliminary Review", "आपकी शुरुआती जाँच"],
+  redTitle: ["🚩 Warning Signs", "🚩 खतरे के संकेत"],
+  greenTitle: ["✅ Safer Steps", "✅ सुरक्षित कदम"],
+  shareBtn: ["Share Report on WhatsApp", "रिपोर्ट WhatsApp पर साझा करें"],
+  redCardTitle: ["🚩 Red Flags", "🚩 खतरे के संकेत"],
+  redCardText: [
+    "Be cautious of upfront fees, pressure tactics, unclear terms, and requests for OTPs or PINs.",
+    "पहले पैसे माँगने, दबाव डालने, अस्पष्ट शर्तों और OTP या PIN माँगने से सावधान रहें।"
+  ],
+  greenCardTitle: ["🟢 Safer Borrowing", "🟢 सुरक्षित उधार"],
+  greenCardText: [
+    "Verify the lender independently, read all terms, and keep copies of documents and communications.",
+    "लेंडर की स्वतंत्र रूप से जाँच करें, सभी शर्तें पढ़ें और दस्तावेज़ सुरक्षित रखें।"
+  ],
+  stepsTitle: ["🛡️ Before You Accept a Loan", "🛡️ लोन स्वीकार करने से पहले"],
+  footerText: [
+    "LoanShield AI · Awareness and preliminary checks only. No review can guarantee that a loan offer is safe.",
+    "LoanShield AI · केवल जागरूकता और शुरुआती जाँच। कोई जाँच लोन की सुरक्षा की गारंटी नहीं देती।"
+  ]
+};
+
+function toggleLanguage() {
+  hindi = !hindi;
+  document.getElementById("langBtn").textContent = hindi ? "English" : "हिंदी";
+  Object.keys(translations).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = translations[id][hindi ? 1 : 0];
+  });
+
+  document.getElementById("company").placeholder = hindi
+    ? "बैंक या लेंडिंग ऐप का नाम"
+    : "Enter bank or lending app name";
+  document.getElementById("offer").placeholder = hindi
+    ? "लोन ऑफर की जानकारी लिखें। OTP, पासवर्ड या अकाउंट नंबर न डालें।"
+    : "Paste offer details. Do not include OTPs, passwords, or account numbers.";
+
+  document.getElementById("fees").options[0].text = hindi ? "पता नहीं" : "Not sure";
+  document.getElementById("fees").options[1].text = hindi ? "हाँ, स्पष्ट है" : "Yes, clearly explained";
+  document.getElementById("fees").options[2].text = hindi ? "नहीं, अस्पष्ट है" : "No, unclear or hidden";
+  document.getElementById("lender").options[0].text = hindi ? "जाँच नहीं की" : "Not verified";
+  document.getElementById("lender").options[1].text = hindi ? "आधिकारिक स्रोत से सत्यापित" : "Verified through official sources";
+  document.getElementById("lender").options[2].text = hindi ? "सत्यापन नहीं / संदिग्ध" : "Cannot verify / suspicious";
+  document.getElementById("advance").options[0].text = hindi ? "नहीं" : "No";
+  document.getElementById("advance").options[1].text = hindi ? "हाँ" : "Yes";
+  document.getElementById("advance").options[2].text = hindi ? "पता नहीं" : "Not sure";
+
+  document.getElementById("stepsList").innerHTML = hindi
+    ? "<li>आधिकारिक स्रोत से लेंडर की जाँच करें।</li><li>लोन एग्रीमेंट और सभी फीस पढ़ें।</li><li>OTP, PIN या बैंकिंग पासवर्ड साझा न करें।</li><li>लोन जारी करने के नाम पर संदिग्ध एडवांस फीस न दें।</li><li>फ्रॉड का शक हो तो बैंक या साइबर क्राइम अधिकारियों से संपर्क करें।</li>"
+    : "<li>Verify the lender using official regulator or bank sources.</li><li>Read the complete loan agreement and all applicable fees.</li><li>Never share an OTP, PIN, or banking password.</li><li>Do not pay suspicious advance fees to release a loan.</li><li>Contact your bank or local cybercrime authorities if you suspect fraud.</li>";
+
+  if (document.getElementById("result").style.display === "block") {
+    document.getElementById("scoreLabel").textContent = hindi
+      ? "यह शुरुआती संकेतक है, सुरक्षा की गारंटी नहीं।"
+      : "This is a preliminary indicator, not a safety guarantee.";
+  }
+}
+
+function reviewOffer() {
+  const company = document.getElementById("company").value.trim();
+  const offer = document.getElementById("offer").value.trim();
+  const fees = document.getElementById("fees").value;
+  const lender = document.getElementById("lender").value;
+  const advance = document.getElementById("advance").value;
+
+  let risk = 0;
+  const red = [];
+  const green = [];
+
+  if (lender === "unverified") {
+    risk += 35;
+    red.push(hindi ? "लेंडर की पहचान सत्यापित नहीं है।" : "The lender could not be verified.");
+  } else if (lender === "unknown") {
+    risk += 15;
+    red.push(hindi ? "लेंडर की स्वतंत्र जाँच करें।" : "Independently verify the lender.");
+  } else {
+    green.push(hindi ? "आपने लेंडर को आधिकारिक स्रोत से सत्यापित किया है।" : "You report verifying the lender through official sources.");
+  }
+
+  if (fees === "no") {
+    risk += 25;
+    red.push(hindi ? "फीस या चार्ज स्पष्ट नहीं हैं।" : "Fees or charges are unclear.");
+  } else if (fees === "unknown") {
+    risk += 10;
+    red.push(hindi ? "सभी फीस और शर्तें जाँचें।" : "Check all fees and terms.");
+  } else {
+    green.push(hindi ? "फीस की जानकारी स्पष्ट बताई गई है।" : "Fees are reported to be clearly explained.");
+  }
+
+  if (advance === "yes") {
+    risk += 35;
+    red.push(hindi ? "लोन से पहले भुगतान की माँग को सावधानी से जाँचें।" : "Carefully verify any demand for payment before disbursal.");
+  } else if (advance === "unknown") {
+    risk += 10;
+    red.push(hindi ? "जाँचें कि पहले से कोई भुगतान माँगा जा रहा है या नहीं।" : "Check whether any upfront payment is required.");
+  } else {
+    green.push(hindi ? "आपने बताया कि पहले भुगतान नहीं माँगा गया।" : "You report that no advance payment is demanded.");
+  }
+
+  const suspicious = /otp|pin|password|urgent|guaranteed|processing fee|pay first|advance fee|unlock loan|send money/i.test(offer);
+  if (suspicious) {
+    risk += 20;
+    red.push(hindi
+      ? "मैसेज में संवेदनशील जानकारी, जल्दबाज़ी या पहले भुगतान से जुड़े शब्द हो सकते हैं।"
+      : "The message may contain terms associated with sensitive information, urgency, or upfront payment.");
+  }
+
+  if (!offer && !company) {
+    red.push(hindi
+      ? "बेहतर समीक्षा के लिए लेंडर और ऑफर की जानकारी भरें।"
+      : "Enter the lender and offer details for a more useful review.");
+  }
+
+  risk = Math.min(100, risk);
+  const score = 100 - risk;
+  const result = document.getElementById("result");
+  result.style.display = "block";
+  document.getElementById("score").textContent = score + "/100";
+  document.getElementById("scoreLabel").textContent = hindi
+    ? "शुरुआती चेकलिस्ट स्कोर — सुरक्षा की गारंटी नहीं।"
+    : "Preliminary checklist score — not a guarantee of safety.";
+
+  document.getElementById("redList").innerHTML = red.length
+    ? red.map(x => "<li>" + escapeHTML(x) + "</li>").join("")
+    : "<li>" + (hindi ? "कोई चुना हुआ जोखिम संकेत नहीं मिला; फिर भी स्वतंत्र जाँच करें।" : "No selected risk indicators; independent verification is still important.") + "</li>";
+
+  document.getElementById("greenList").innerHTML = green.length
+    ? green.map(x => "<li>" + escapeHTML(x) + "</li>").join("")
+    : "<li>" + (hindi ? "आधिकारिक स्रोतों से लेंडर और शर्तों की जाँच करें।" : "Verify the lender and terms using official sources.") + "</li>";
+
+  lastReport = (hindi ? "LoanShield AI शुरुआती समीक्षा\n" : "LoanShield AI Preliminary Review\n") +
+    (company ? (hindi ? "लेंडर: " : "Lender: ") + company + "\n" : "") +
+    (hindi ? "चेकलिस्ट स्कोर: " : "Checklist score: ") + score + "/100\n" +
+    red.join("\n") + "\n" +
+    (hindi ? "यह स्कोर सुरक्षा की गारंटी नहीं है।" : "This score is not a safety guarantee.");
+
+  result.scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+function escapeHTML(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+function shareReport() {
+  const message = lastReport || (hindi ? "LoanShield AI रिपोर्ट" : "LoanShield AI report");
+  const url = "https://wa.me/?text=" + encodeURIComponent(message);
+  if (window.LoanShieldApp && typeof window.LoanShieldApp.shareOnWhatsApp === "function") {
+    window.LoanShieldApp.shareOnWhatsApp(message);
+  } else {
+    window.open(url, "_blank");
+  }
+}
+</script>
 </body>
 </html>
