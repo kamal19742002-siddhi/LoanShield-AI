@@ -40,7 +40,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 
     private static final String TAG = "LoanShieldAI";
-    private static final String APP_WEB_URL = "https://kamal19742002-siddhi.github.io/loanshield-ai/";
+    private static final String APP_WEB_URL = "https://kamal19742002-siddhi.github.io/LoanShield-AI/";
     private static final String PREFS_NAME = "LoanShieldPrefs";
     private static final int PERMISSION_REQUEST_CODE = 100;
 
