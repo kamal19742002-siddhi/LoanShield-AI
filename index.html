@@ -1,454 +1,328 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#14264a">
 <title>LoanShield AI</title>
-
 <style>
-:root{--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#657187;--primary:#245eea;--border:#e1e7f0}
+:root{--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#657187;--primary:#245eea;--border:#e1e7f0;--soft:#eaf0ff}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);transition:.2s}
-body.dark{--bg:#101827;--card:#1b2638;--text:#f2f5fb;--muted:#b3bfd1;--primary:#78a0ff;--border:#344155}
-header{background:#14264a;color:white;padding:20px 16px}
-.top{max-width:850px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.brand{font-size:22px;font-weight:800}.brand span{color:#75a2ff}
-.controls{display:flex;gap:7px;align-items:center}
+body{margin:0;font-family:Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text);transition:.2s;line-height:1.5}
+body.dark{--bg:#101827;--card:#1b2638;--text:#f2f5fb;--muted:#b3bfd1;--primary:#78a0ff;--border:#344155;--soft:#263858}
+header{background:#14264a;color:white;padding:16px}
+.top{max-width:920px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:22px;font-weight:800;white-space:nowrap}.brand span{color:#75a2ff}
+.controls{display:flex;gap:8px;align-items:center}
 button,select,input,textarea{font:inherit;border-radius:10px}
 button{border:0;padding:12px;cursor:pointer;font-weight:700}
-.langSelect,.theme{background:#263c63;color:white;border:0}
-.langSelect{width:auto;max-width:145px;padding:12px 7px;font-weight:700}
-.theme{min-width:52px;font-size:21px}
-main{max-width:850px;padding:20px 14px 45px;margin:auto}
-.hero{background:linear-gradient(135deg,#1b4fc4,#673bd2);color:white;border-radius:28px;padding:28px 22px;margin-bottom:18px}
-.hero h1{font-size:27px;margin:0 0 12px;line-height:1.25}
-.hero p{font-size:18px;line-height:1.55;margin:0}
-.card{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:22px;margin:18px 0}
-h2{font-size:22px;margin:0 0 20px}
-label{display:block;font-weight:700;margin:18px 0 8px}
-input,textarea,.field{width:100%;padding:15px;background:var(--bg);color:var(--text);border:1px solid var(--border);font-size:16px}
-textarea{min-height:115px;resize:vertical}
-.primary{width:100%;margin-top:18px;background:var(--primary);color:white;padding:15px}
-.secondary{background:var(--bg);color:var(--text);border:1px solid var(--border)}
-.note,.muted{color:var(--muted);font-size:13px;line-height:1.6}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tile{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
-.tile h3{margin-top:0}.tile p{color:var(--muted);line-height:1.5}
-#result{display:none}
-.score{font-size:38px;font-weight:800;color:var(--primary);margin:12px 0}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #8bb4ff;outline-offset:2px}
+.langSelect,.theme{background:#263c63;color:white;border:1px solid #536b91}
+.langSelect{max-width:150px;padding:10px 7px}.theme{min-width:48px;font-size:21px}
+main{max-width:920px;padding:20px 14px 40px;margin:auto}
+.hero{background:linear-gradient(135deg,#1b4fc4,#673bd2);color:white;border-radius:25px;padding:26px 22px;margin-bottom:18px}
+.hero h1{font-size:28px;margin:0 0 10px;line-height:1.25}.hero p{margin:0;font-size:17px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:21px;margin:17px 0;min-width:0}
+h2{font-size:21px;margin:0 0 14px}h3{font-size:17px;margin:0 0 8px}
+label{display:block;font-weight:700;margin:15px 0 7px}
+input,textarea,.field{width:100%;padding:13px;background:var(--bg);color:var(--text);border:1px solid var(--border);font-size:16px}
+textarea{min-height:105px;resize:vertical}
+button.primary{width:100%;margin-top:17px;background:var(--primary);color:white;padding:14px}
+button.secondary{background:var(--soft);color:var(--text);border:1px solid var(--border)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;min-width:0}
+.tile p,.muted,.note{color:var(--muted);font-size:14px}
+.note{line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.actions button{flex:1}
+.pill{display:inline-block;border-radius:30px;padding:6px 12px;background:var(--soft);font-weight:700;font-size:13px}
+.resultbox{padding:14px;border-radius:13px;background:var(--bg);border:1px solid var(--border);margin:10px 0}
+.score{font-size:36px;font-weight:800;color:var(--primary);margin:8px 0}
 ul{padding-inline-start:22px;line-height:1.8}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:15px 20px 30px}
+a{color:var(--primary);overflow-wrap:anywhere}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 20px 30px}
+.hidden{display:none!important}
+hr{border:0;border-top:1px solid var(--border);margin:20px 0}
+small{color:var(--muted)}
 html[dir=rtl] body{text-align:right}
-@media(max-width:520px){.grid{grid-template-columns:1fr}.brand{font-size:19px}.hero h1{font-size:25px}.card{padding:18px}.langSelect{max-width:125px}}
+html[dir=rtl] ul{padding-inline-start:0;padding-inline-end:22px}
+html[dir=rtl] .top{direction:rtl}
+@media(max-width:540px){.grid{grid-template-columns:1fr}.brand{font-size:18px}.hero h1{font-size:25px}.card{padding:16px}.langSelect{max-width:120px;font-size:13px}.top{gap:7px}.controls{gap:5px}}
+@media print{header,.hero,.no-print,footer{display:none!important}body{background:white;color:black}.card,.tile{box-shadow:none;border:1px solid #bbb;break-inside:avoid}main{max-width:100%;padding:0}.hidden{display:none!important}a{color:black}}
 </style>
 </head>
-
 <body>
 <header>
  <div class="top">
   <div class="brand">🛡️ LoanShield <span>AI</span></div>
   <div class="controls">
-   <select class="langSelect" id="languageSelect" aria-label="Language">
-    <option value="en">English</option>
-    <option value="hi">हिन्दी</option>
-    <option value="ur">اردو</option>
-    <option value="pa">ਪੰਜਾਬੀ</option>
-    <option value="ml">മലയാളം</option>
-    <option value="kn">ಕನ್ನಡ</option>
-    <option value="gu">ગુજરાતી</option>
-    <option value="bn">বাংলা</option>
-    <option value="ta">தமிழ்</option>
-    <option value="te">తెలుగు</option>
+   <select id="languageSelect" class="langSelect" aria-label="Language">
+    <option value="en">English</option><option value="hi">हिन्दी</option>
+    <option value="ur">اردو</option><option value="pa">ਪੰਜਾਬੀ</option>
+    <option value="ml">മലയാളം</option><option value="kn">ಕನ್ನಡ</option>
+    <option value="gu">ગુજરાતી</option><option value="bn">বাংলা</option>
+    <option value="ta">தமிழ்</option><option value="te">తెలుగు</option>
     <option value="mr">मराठी</option>
    </select>
-   <button class="theme" id="themeBtn" aria-label="Toggle dark mode">🌙</button>
+   <button class="theme" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
   </div>
  </div>
 </header>
 
 <main>
  <section class="hero">
-  <h1 id="heroTitle"></h1>
-  <p id="heroText"></p>
+  <h1 data-i="heroTitle">Protect Yourself Before Taking a Loan</h1>
+  <p data-i="heroText">Review loan offers, identify warning signs, and make informed borrowing decisions.</p>
  </section>
 
  <section class="card">
-  <h2 id="reviewTitle"></h2>
+  <h2 data-i="reviewTitle">🔎 Review a Loan Offer</h2>
+  <label for="company" data-i="companyLabel">Bank / Lender Name</label>
+  <input id="company" maxlength="150" autocomplete="off" data-ph="companyPH" placeholder="Enter bank or lending app name">
 
-  <label id="companyLabel" for="company"></label>
-  <input id="company" autocomplete="off">
+  <label for="offer" data-i="offerLabel">Loan Offer or Message</label>
+  <textarea id="offer" maxlength="12000" data-ph="offerPH" placeholder="Paste the offer or suspicious message here. Remove personal details first."></textarea>
 
-  <label id="offerLabel" for="offer"></label>
-  <textarea id="offer"></textarea>
-
-  <label id="feeLabel" for="fees"></label>
+  <label for="fees" data-i="feeLabel">Are fees clearly explained?</label>
   <select id="fees" class="field">
-   <option value="unknown" data-t="feeUnknown"></option>
-   <option value="yes" data-t="feeYes"></option>
-   <option value="no" data-t="feeNo"></option>
+   <option value="unknown" data-i="unknown">Not sure</option>
+   <option value="yes" data-i="feeYes">Yes, clearly explained</option>
+   <option value="no" data-i="feeNo">No, unclear or hidden</option>
   </select>
 
-  <label id="regLabel" for="lender"></label>
+  <label for="lender" data-i="regLabel">Lender verification status</label>
   <select id="lender" class="field">
-   <option value="unknown" data-t="lenderUnknown"></option>
-   <option value="verified" data-t="lenderVerified"></option>
-   <option value="unverified" data-t="lenderUnverified"></option>
+   <option value="unknown" data-i="unknown">Not sure</option>
+   <option value="verified" data-i="verified">Independently verified</option>
+   <option value="unverified" data-i="unverified">Unverified / suspicious</option>
   </select>
 
-  <label id="advanceLabel" for="advance"></label>
+  <label for="advance" data-i="advanceLabel">Is advance payment demanded before disbursal?</label>
   <select id="advance" class="field">
-   <option value="no" data-t="no"></option>
-   <option value="yes" data-t="yes"></option>
-   <option value="unknown" data-t="feeUnknown"></option>
+   <option value="unknown" data-i="unknown">Not sure</option>
+   <option value="no" data-i="no">No</option>
+   <option value="yes" data-i="yes">Yes</option>
   </select>
-
-  <button class="primary" id="reviewBtn"></button>
-  <p class="note" id="privacyNote"></p>
+  <button class="primary" id="reviewBtn" data-i="reviewBtn">Check Loan Safety</button>
+  <p class="note" data-i="privacyNote">Your form details are processed in this page and are not saved by this app. Avoid entering account numbers, Aadhaar, passwords, PINs or OTPs.</p>
  </section>
 
- <section class="card" id="result" aria-live="polite">
-  <h2 id="resultTitle"></h2>
-  <div class="score" id="score"></div>
-  <p id="scoreLabel"></p>
-  <h3 id="redTitle"></h3>
-  <ul id="redList"></ul>
-  <h3 id="greenTitle"></h3>
-  <ul id="greenList"></ul>
-  <button class="secondary" id="shareBtn"></button>
+ <section class="card hidden" id="result" aria-live="polite">
+  <h2 data-i="resultTitle">Your Preliminary Review</h2>
+  <span id="riskBadge" class="pill"></span>
+  <div class="score" id="score">—</div>
+  <p id="scoreText" class="muted"></p>
+  <div class="resultbox">
+   <h3 data-i="redTitle">🚩 Warning Signs</h3>
+   <ul id="redList"></ul>
+  </div>
+  <div class="resultbox">
+   <h3 data-i="greenTitle">✅ Recommended Actions</h3>
+   <ul id="greenList"></ul>
+  </div>
+  <p class="note" data-i="scoreDisclaimer">This is a preliminary checklist, not a verified fraud detector. A low score does not prove that a lender is legitimate.</p>
+  <div class="actions no-print">
+   <button class="secondary" id="shareBtn" data-i="shareBtn">Share on WhatsApp</button>
+   <button class="secondary" id="printBtn" data-i="printBtn">Print / Save PDF</button>
+   <button class="secondary" id="resetBtn" data-i="resetBtn">Clear Form</button>
+  </div>
  </section>
 
  <section class="grid">
-  <div class="tile"><h3 id="redCardTitle"></h3><p id="redCardText"></p></div>
-  <div class="tile"><h3 id="greenCardTitle"></h3><p id="greenCardText"></p></div>
+  <div class="tile"><h3 data-i="redCardTitle">🚩 Common Red Flags</h3><p data-i="redCardText">Upfront payment demands, guaranteed approval, pressure tactics, and requests for OTPs or PINs.</p></div>
+  <div class="tile"><h3 data-i="greenCardTitle">🟢 Safer Borrowing</h3><p data-i="greenCardText">Verify the lender independently, read the agreement, compare the APR and fees, and keep copies.</p></div>
  </section>
 
  <section class="card">
-  <h2 id="stepsTitle"></h2>
-  <ul id="stepsList"></ul>
+  <h2 data-i="verifyTitle">🏦 Verify a Lender</h2>
+  <p data-i="verifyText">Use official sources to check the legal lender name and whether the institution is authorised. A website or app logo alone is not proof.</p>
+  <div class="actions">
+   <a href="https://www.rbi.org.in/" target="_blank" rel="noopener noreferrer" data-i="rbiLink">Open official RBI website ↗</a>
+   <a href="https://sachet.rbi.org.in/" target="_blank" rel="noopener noreferrer" data-i="sachetLink">RBI Sachet portal ↗</a>
+  </div>
+  <p class="note" data-i="verifyNote">These links provide official resources; this app does not directly verify any lender or guarantee a search result.</p>
+ </section>
+
+ <section class="card">
+  <h2 data-i="emiTitle">🧮 EMI and Loan Cost Calculator</h2>
+  <p class="muted" data-i="emiText">Estimate monthly repayments. Enter the annual interest rate and loan term.</p>
+  <div class="grid">
+   <div><label for="principal" data-i="principalLabel">Loan amount (₹)</label><input id="principal" type="number" min="1" max="100000000000" step="any" value="100000"></div>
+   <div><label for="rate" data-i="rateLabel">Annual interest (%)</label><input id="rate" type="number" min="0" max="100" step="any" value="12"></div>
+   <div><label for="months" data-i="monthsLabel">Loan term (months)</label><input id="months" type="number" min="1" max="600" step="1" value="12"></div>
+   <div><label for="processing" data-i="processingLabel">Processing fee (₹)</label><input id="processing" type="number" min="0" max="100000000" step="any" value="0"></div>
+  </div>
+  <button class="primary" id="emiBtn" data-i="emiBtn">Calculate EMI</button>
+  <div id="emiResult" class="resultbox hidden" aria-live="polite">
+   <p><span data-i="monthlyEMI">Monthly EMI</span>: <strong id="emiValue"></strong></p>
+   <p><span data-i="totalInterest">Total interest</span>: <strong id="interestValue"></strong></p>
+   <p><span data-i="totalRepay">Total repayments</span>: <strong id="repayValue"></strong></p>
+   <p><span data-i="totalCost">Repayments + processing fee</span>: <strong id="costValue"></strong></p>
+  </div>
+  <p class="note" data-i="emiNote">Estimate only. Actual lender calculations, taxes, insurance, variable rates and other charges may differ.</p>
+ </section>
+
+ <section class="card">
+  <h2 data-i="stepsTitle">🛡️ Before You Accept a Loan</h2>
+  <ul>
+   <li data-i="step1">Verify the lender through official sources.</li>
+   <li data-i="step2">Read the full agreement, APR and all fees.</li>
+   <li data-i="step3">Never share OTPs, PINs or banking passwords.</li>
+   <li data-i="step4">Do not pay suspicious advance fees to release a loan.</li>
+   <li data-i="step5">Report suspected fraud to your bank and relevant authorities.</li>
+  </ul>
  </section>
 </main>
-
-<footer id="footerText"></footer>
+<footer data-i="footerText">LoanShield AI · Awareness tool only. No financial or safety guarantee.</footer>
 
 <script>
+"use strict";
 const $=id=>document.getElementById(id);
-const LANG_KEY="loanshield-language";
-const THEME_KEY="loanshield-dark-mode";
-
-const keys=[
-"heroTitle","heroText","reviewTitle","companyLabel","companyPlaceholder",
-"offerLabel","offerPlaceholder","feeLabel","feeUnknown","feeYes","feeNo",
-"regLabel","lenderUnknown","lenderVerified","lenderUnverified","advanceLabel",
-"no","yes","reviewBtn","privacyNote","resultTitle","redTitle","greenTitle",
-"shareBtn","redCardTitle","redCardText","greenCardTitle","greenCardText",
-"stepsTitle","steps","footerText","lenderBad","lenderCheck","lenderGood",
-"feesBad","feesCheck","feesGood","advanceBad","advanceCheck","advanceGood",
-"suspicious","enterDetails","noRisks","verifyTerms","scoreLabel",
-"noGuarantee","reportTitle","lenderPrefix","scorePrefix","report"
-];
-
-const en=[
-"Protect Yourself Before Taking a Loan",
-"Review loan offers, identify warning signs, and make a more informed borrowing decision.",
-"🔎 Review a Loan Offer","Bank / Lender Name","Enter bank or lending app name",
-"Loan Offer Details","Paste offer details. Do not include passwords, OTPs, or account numbers.",
-"Are fees or charges clearly explained?","Not sure","Yes, clearly explained","No, unclear or hidden",
-"Lender verification","Not verified","Verified through official sources","Cannot verify / suspicious",
-"Is advance payment demanded before loan disbursal?","No","Yes","Check Loan Safety",
-"This is a preliminary checklist, not verified fraud detection or financial advice. Do not enter confidential information.",
-"Your Preliminary Review","🚩 Warning Signs","✅ Safer Steps","Share Report on WhatsApp",
-"🚩 Red Flags","Be cautious of upfront fees, pressure tactics, unclear terms, and requests for OTPs or PINs.",
-"🟢 Safer Borrowing","Verify the lender independently, read all terms, and keep copies of documents.",
-"🛡️ Before You Accept a Loan",
-"Verify the lender using official sources.|Read the complete loan agreement and fees.|Never share OTPs, PINs, or banking passwords.|Do not pay suspicious advance fees.|Contact your bank or cybercrime authorities if you suspect fraud.",
-"LoanShield AI · Awareness and preliminary checks only. No review can guarantee safety.",
-"The lender could not be verified.|Independently verify the lender.|You report verifying the lender through official sources.|Fees or charges are unclear.|Check all fees and terms.|Fees are reported to be clearly explained.|Carefully verify any payment demand before disbursal.|Check whether upfront payment is required.|You report no advance payment is demanded.|The message may contain suspicious terms or payment requests.|Enter lender and offer details for a more useful review.|No selected risk indicators; independent verification is still important.|Verify the lender and terms using official sources.|Preliminary checklist score — not a guarantee of safety.|This score is not a safety guarantee.|LoanShield AI Preliminary Review|Lender: |Checklist score: |LoanShield AI report"
-];
-
-const hi=[
-"लोन लेने से पहले खुद को सुरक्षित रखें",
-"लोन ऑफ़र की जाँच करें, खतरे के संकेत पहचानें और सोच-समझकर निर्णय लें।",
-"🔎 लोन ऑफ़र की जाँच करें","बैंक / ऋणदाता का नाम","बैंक या लोन ऐप का नाम दर्ज करें",
-"लोन ऑफ़र की जानकारी","ऑफ़र की जानकारी लिखें। पासवर्ड, OTP या खाता नंबर न डालें।",
-"क्या शुल्क स्पष्ट रूप से बताए गए हैं?","पता नहीं","हाँ, स्पष्ट रूप से","नहीं, अस्पष्ट या छिपे हुए",
-"ऋणदाता का सत्यापन","सत्यापित नहीं","आधिकारिक स्रोतों से सत्यापित","सत्यापित नहीं / संदिग्ध",
-"क्या लोन मिलने से पहले अग्रिम भुगतान माँगा जा रहा है?","नहीं","हाँ","लोन की सुरक्षा जाँचें",
-"यह शुरुआती जाँच-सूची है, प्रमाणित धोखाधड़ी पहचान सेवा या वित्तीय सलाह नहीं। निजी जानकारी न डालें।",
-"आपकी शुरुआती जाँच","🚩 खतरे के संकेत","✅ सुरक्षित कदम","रिपोर्ट WhatsApp पर साझा करें",
-"🚩 खतरे के संकेत","पहले शुल्क माँगने, दबाव डालने, अस्पष्ट शर्तों और OTP या PIN माँगने से सावधान रहें।",
-"🟢 सुरक्षित उधार","ऋणदाता की स्वतंत्र जाँच करें, सभी शर्तें पढ़ें और दस्तावेज़ों की प्रतियाँ रखें।",
-"🛡️ लोन स्वीकार करने से पहले",
-"आधिकारिक स्रोतों से ऋणदाता की जाँच करें।|लोन समझौता और सभी शुल्क पढ़ें।|OTP, PIN या पासवर्ड साझा न करें।|संदिग्ध अग्रिम शुल्क न दें।|धोखाधड़ी का संदेह हो तो बैंक या साइबर अपराध अधिकारियों से संपर्क करें।",
-"LoanShield AI · केवल जागरूकता और शुरुआती जाँच। सुरक्षा की गारंटी नहीं।",
-"ऋणदाता का सत्यापन नहीं हो सका।|ऋणदाता की स्वतंत्र जाँच करें।|आपके अनुसार आधिकारिक स्रोतों से सत्यापन हुआ।|शुल्क स्पष्ट नहीं हैं।|सभी शुल्क और शर्तें जाँचें।|शुल्क स्पष्ट बताए गए हैं।|लोन से पहले भुगतान की माँग जाँचें।|जाँचें कि अग्रिम भुगतान माँगा जा रहा है या नहीं।|आपके अनुसार अग्रिम भुगतान नहीं माँगा गया।|संदेश में संदिग्ध शर्तें या भुगतान माँग हो सकती है।|बेहतर समीक्षा के लिए विवरण भरें।|चुने गए जोखिम संकेत नहीं मिले; फिर भी स्वतंत्र जाँच ज़रूरी है।|आधिकारिक स्रोतों से ऋणदाता और शर्तों की जाँच करें।|शुरुआती जाँच स्कोर — सुरक्षा की गारंटी नहीं।|यह स्कोर सुरक्षा की गारंटी नहीं है।|LoanShield AI शुरुआती समीक्षा|ऋणदाता: |जाँच स्कोर: |LoanShield AI रिपोर्ट"
-];
-
-const translations={
-en,
-hi,
-ur:[
-"قرض لینے سے پہلے خود کو محفوظ رکھیں","قرض کی پیشکش کا جائزہ لیں اور خطرے کی علامات پہچانیں۔",
-"🔎 قرض کی پیشکش کا جائزہ","بینک / قرض دہندہ کا نام","بینک یا قرض ایپ کا نام لکھیں",
-"قرض کی تفصیلات","تفصیلات لکھیں۔ پاس ورڈ، OTP یا اکاؤنٹ نمبر نہ لکھیں۔",
-"کیا فیس واضح ہے؟","یقین نہیں","ہاں، واضح ہے","نہیں، غیر واضح",
-"قرض دہندہ کی تصدیق","تصدیق نہیں ہوئی","سرکاری ذرائع سے تصدیق شدہ","مشکوک / تصدیق نہیں ہوئی",
-"کیا قرض سے پہلے پیشگی ادائیگی مانگی جا رہی ہے؟","نہیں","ہاں","قرض کی حفاظت جانچیں",
-"یہ ابتدائی جانچ ہے، مالی مشورہ نہیں۔ خفیہ معلومات درج نہ کریں۔",
-"ابتدائی جائزہ","🚩 خطرے کی علامات","✅ محفوظ اقدامات","رپورٹ WhatsApp پر شیئر کریں",
-"🚩 خطرات","پیشگی فیس، دباؤ، غیر واضح شرائط اور OTP/PIN مانگنے سے محتاط رہیں۔",
-"🟢 محفوظ قرض","قرض دہندہ کی تصدیق کریں، شرائط پڑھیں اور دستاویزات محفوظ رکھیں۔",
-"🛡️ قرض قبول کرنے سے پہلے",
-"سرکاری ذرائع سے تصدیق کریں۔|معاہدہ اور تمام فیس پڑھیں۔|OTP، PIN یا پاس ورڈ شیئر نہ کریں۔|مشکوک پیشگی فیس ادا نہ کریں۔|شبہ ہو تو بینک یا سائبر کرائم حکام سے رابطہ کریں۔",
-"LoanShield AI · ابتدائی جانچ، حفاظت کی ضمانت نہیں۔",
-"قرض دہندہ کی تصدیق نہیں ہوئی۔|خود تصدیق کریں۔|آپ کے مطابق سرکاری تصدیق ہوئی۔|فیس واضح نہیں۔|تمام فیس جانچیں۔|فیس واضح ہے۔|پیشگی ادائیگی کی مانگ جانچیں۔|دیکھیں کہ پیشگی رقم مانگی گئی ہے یا نہیں۔|آپ کے مطابق پیشگی رقم نہیں مانگی گئی۔|پیغام میں مشکوک مطالبات ہو سکتے ہیں۔|مزید تفصیلات درج کریں۔|خطرے کی علامات نہیں ملیں؛ پھر بھی تصدیق ضروری ہے۔|سرکاری ذرائع سے شرائط جانچیں۔|ابتدائی اسکور، ضمانت نہیں۔|یہ اسکور ضمانت نہیں۔|ابتدائی رپورٹ|قرض دہندہ: |جانچ اسکور: |LoanShield AI رپورٹ"
-],
-pa:[
-"ਕਰਜ਼ਾ ਲੈਣ ਤੋਂ ਪਹਿਲਾਂ ਆਪਣੀ ਸੁਰੱਖਿਆ ਕਰੋ","ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਜਾਂਚੋ ਅਤੇ ਖ਼ਤਰੇ ਦੇ ਸੰਕੇਤ ਪਛਾਣੋ।",
-"🔎 ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਦੀ ਜਾਂਚ","ਬੈਂਕ / ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦਾ ਨਾਮ","ਬੈਂਕ ਜਾਂ ਕਰਜ਼ਾ ਐਪ ਦਾ ਨਾਮ ਲਿਖੋ",
-"ਕਰਜ਼ੇ ਦੀ ਜਾਣਕਾਰੀ","ਵੇਰਵੇ ਲਿਖੋ। ਪਾਸਵਰਡ, OTP ਜਾਂ ਖਾਤਾ ਨੰਬਰ ਨਾ ਪਾਓ।",
-"ਕੀ ਫੀਸਾਂ ਸਪਸ਼ਟ ਹਨ?","ਪਤਾ ਨਹੀਂ","ਹਾਂ, ਸਪਸ਼ਟ ਹਨ","ਨਹੀਂ, ਅਸਪਸ਼ਟ ਹਨ",
-"ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ","ਪੁਸ਼ਟੀ ਨਹੀਂ ਹੋਈ","ਅਧਿਕਾਰਤ ਸਰੋਤਾਂ ਤੋਂ ਪੁਸ਼ਟੀ","ਸ਼ੱਕੀ / ਪੁਸ਼ਟੀ ਨਹੀਂ ਹੋਈ",
-"ਕੀ ਕਰਜ਼ੇ ਤੋਂ ਪਹਿਲਾਂ ਅਗਾਊਂ ਪੈਸੇ ਮੰਗੇ ਜਾਂਦੇ ਹਨ?","ਨਹੀਂ","ਹਾਂ","ਕਰਜ਼ੇ ਦੀ ਸੁਰੱਖਿਆ ਜਾਂਚੋ",
-"ਇਹ ਮੁੱਢਲੀ ਜਾਂਚ ਹੈ, ਵਿੱਤੀ ਸਲਾਹ ਨਹੀਂ। ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਨਾ ਪਾਓ।",
-"ਮੁੱਢਲੀ ਜਾਂਚ","🚩 ਖ਼ਤਰੇ ਦੇ ਸੰਕੇਤ","✅ ਸੁਰੱਖਿਅਤ ਕਦਮ","WhatsApp 'ਤੇ ਰਿਪੋਰਟ ਸਾਂਝੀ ਕਰੋ",
-"🚩 ਖ਼ਤਰੇ","ਅਗਾਊਂ ਫੀਸ, ਦਬਾਅ, ਅਸਪਸ਼ਟ ਸ਼ਰਤਾਂ ਅਤੇ OTP/PIN ਤੋਂ ਸਾਵਧਾਨ ਰਹੋ।",
-"🟢 ਸੁਰੱਖਿਅਤ ਕਰਜ਼ਾ","ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਸਾਰੀਆਂ ਸ਼ਰਤਾਂ ਪੜ੍ਹੋ।",
-"🛡️ ਕਰਜ਼ਾ ਲੈਣ ਤੋਂ ਪਹਿਲਾਂ",
-"ਅਧਿਕਾਰਤ ਸਰੋਤਾਂ ਤੋਂ ਜਾਂਚ ਕਰੋ।|ਕਰਜ਼ੇ ਦਾ ਸਮਝੌਤਾ ਅਤੇ ਫੀਸਾਂ ਪੜ੍ਹੋ।|OTP, PIN ਜਾਂ ਪਾਸਵਰਡ ਸਾਂਝਾ ਨਾ ਕਰੋ।|ਸ਼ੱਕੀ ਅਗਾਊਂ ਫੀਸ ਨਾ ਦਿਓ।|ਸ਼ੱਕ ਹੋਵੇ ਤਾਂ ਬੈਂਕ ਜਾਂ ਸਾਈਬਰ ਅਪਰਾਧ ਅਧਿਕਾਰੀਆਂ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।",
-"LoanShield AI · ਮੁੱਢਲੀ ਜਾਂਚ, ਸੁਰੱਖਿਆ ਦੀ ਗਾਰੰਟੀ ਨਹੀਂ।",
-"ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ ਨਹੀਂ ਹੋਈ।|ਖੁਦ ਜਾਂਚ ਕਰੋ।|ਤੁਹਾਡੇ ਅਨੁਸਾਰ ਅਧਿਕਾਰਤ ਪੁਸ਼ਟੀ ਹੋਈ।|ਫੀਸਾਂ ਸਪਸ਼ਟ ਨਹੀਂ।|ਸਾਰੀਆਂ ਫੀਸਾਂ ਜਾਂਚੋ।|ਫੀਸਾਂ ਸਪਸ਼ਟ ਹਨ।|ਅਗਾਊਂ ਭੁਗਤਾਨ ਦੀ ਮੰਗ ਜਾਂਚੋ।|ਅਗਾਊਂ ਪੈਸੇ ਮੰਗੇ ਹਨ ਜਾਂ ਨਹੀਂ ਦੇਖੋ।|ਤੁਹਾਡੇ ਅਨੁਸਾਰ ਅਗਾਊਂ ਪੈਸੇ ਨਹੀਂ ਮੰਗੇ।|ਸੁਨੇਹੇ ਵਿੱਚ ਸ਼ੱਕੀ ਮੰਗ ਹੋ ਸਕਦੀ ਹੈ।|ਹੋਰ ਵੇਰਵੇ ਭਰੋ।|ਖ਼ਤਰੇ ਨਹੀਂ ਮਿਲੇ; ਫਿਰ ਵੀ ਜਾਂਚ ਜ਼ਰੂਰੀ ਹੈ।|ਅਧਿਕਾਰਤ ਸਰੋਤਾਂ ਤੋਂ ਸ਼ਰਤਾਂ ਜਾਂਚੋ।|ਮੁੱਢਲਾ ਸਕੋਰ, ਗਾਰੰਟੀ ਨਹੀਂ।|ਇਹ ਸਕੋਰ ਗਾਰੰਟੀ ਨਹੀਂ।|ਮੁੱਢਲੀ ਰਿਪੋਰਟ|ਕਰਜ਼ਾ ਦੇਣ ਵਾਲਾ: |ਜਾਂਚ ਸਕੋਰ: |LoanShield AI ਰਿਪੋਰਟ"
-],
-ml:[
-"വായ്പ എടുക്കുന്നതിന് മുമ്പ് സുരക്ഷിതരാകൂ","വായ്പാ ഓഫറുകൾ പരിശോധിച്ച് മുന്നറിയിപ്പ് സൂചനകൾ തിരിച്ചറിയുക.",
-"🔎 വായ്പാ ഓഫർ പരിശോധിക്കുക","ബാങ്ക് / വായ്പാദാതാവിന്റെ പേര്","ബാങ്കിന്റെയോ വായ്പാ ആപ്പിന്റെയോ പേര് നൽകുക",
-"വായ്പാ ഓഫർ വിവരങ്ങൾ","വിവരങ്ങൾ നൽകുക. പാസ്‌വേഡ്, OTP, അക്കൗണ്ട് നമ്പർ നൽകരുത്.",
-"ഫീസുകൾ വ്യക്തമായി വിശദീകരിച്ചിട്ടുണ്ടോ?","ഉറപ്പില്ല","അതെ, വ്യക്തമാണ്","ഇല്ല, വ്യക്തമല്ല",
-"വായ്പാദാതാവിന്റെ സ്ഥിരീകരണം","സ്ഥിരീകരിച്ചിട്ടില്ല","ഔദ്യോഗികമായി സ്ഥിരീകരിച്ചു","സംശയാസ്പദം / സ്ഥിരീകരിച്ചിട്ടില്ല",
-"വായ്പയ്ക്ക് മുമ്പ് മുൻകൂർ പണം ആവശ്യപ്പെടുന്നുണ്ടോ?","ഇല്ല","അതെ","വായ്പയുടെ സുരക്ഷ പരിശോധിക്കുക",
-"ഇത് പ്രാഥമിക പരിശോധനയാണ്, സാമ്പത്തിക ഉപദേശമല്ല. സ്വകാര്യ വിവരങ്ങൾ നൽകരുത്.",
-"പ്രാഥമിക പരിശോധന","🚩 മുന്നറിയിപ്പ് സൂചനകൾ","✅ സുരക്ഷിത നടപടികൾ","WhatsApp-ൽ പങ്കിടുക",
-"🚩 അപകടസൂചനകൾ","മുൻകൂർ ഫീസ്, സമ്മർദം, വ്യക്തമല്ലാത്ത നിബന്ധനകൾ, OTP/PIN ആവശ്യങ്ങൾ എന്നിവയിൽ ജാഗ്രത പാലിക്കുക.",
-"🟢 സുരക്ഷിത വായ്പ","വായ്പാദാതാവിനെ പരിശോധിക്കുകയും നിബന്ധനകൾ വായിക്കുകയും ചെയ്യുക.",
-"🛡️ വായ്പ സ്വീകരിക്കുന്നതിന് മുമ്പ്",
-"ഔദ്യോഗിക ഉറവിടങ്ങളിൽ പരിശോധിക്കുക.|കരാറും എല്ലാ ഫീസുകളും വായിക്കുക.|OTP, PIN, പാസ്‌വേഡ് പങ്കിടരുത്.|സംശയകരമായ മുൻകൂർ ഫീസ് നൽകരുത്.|സംശയമുണ്ടെങ്കിൽ ബാങ്കിനെയോ സൈബർ ക്രൈം അധികൃതരെയോ ബന്ധപ്പെടുക.",
-"LoanShield AI · പ്രാഥമിക പരിശോധന മാത്രം. സുരക്ഷാ ഉറപ്പല്ല.",
-"വായ്പാദാതാവിനെ സ്ഥിരീകരിക്കാനായില്ല.|സ്വതന്ത്രമായി പരിശോധിക്കുക.|ഔദ്യോഗികമായി സ്ഥിരീകരിച്ചതായി അറിയിച്ചു.|ഫീസുകൾ വ്യക്തമല്ല.|എല്ലാ ഫീസുകളും പരിശോധിക്കുക.|ഫീസുകൾ വ്യക്തമാണ്.|മുൻകൂർ പണമാവശ്യപ്പെടൽ പരിശോധിക്കുക.|മുൻകൂർ പണം ആവശ്യപ്പെടുന്നുണ്ടോ പരിശോധിക്കുക.|മുൻകൂർ പണം ആവശ്യപ്പെട്ടിട്ടില്ലെന്ന് അറിയിച്ചു.|സന്ദേശത്തിൽ സംശയകരമായ ആവശ്യങ്ങൾ ഉണ്ടാകാം.|കൂടുതൽ വിവരങ്ങൾ നൽകുക.|അപകടസൂചനകൾ കണ്ടെത്തിയില്ല; പരിശോധന പ്രധാനമാണ്.|ഔദ്യോഗിക ഉറവിടങ്ങളിൽ പരിശോധിക്കുക.|പ്രാഥമിക സ്കോർ, ഉറപ്പല്ല.|ഈ സ്കോർ ഉറപ്പല്ല.|പ്രാഥമിക റിപ്പോർട്ട്|വായ്പാദാതാവ്: |പരിശോധനാ സ്കോർ: |LoanShield AI റിപ്പോർട്ട്"
-],
-kn:[
-"ಸಾಲ ಪಡೆಯುವ ಮೊದಲು ನಿಮ್ಮನ್ನು ಸುರಕ್ಷಿತವಾಗಿರಿಸಿಕೊಳ್ಳಿ","ಸಾಲದ ಆಫರ್ ಪರಿಶೀಲಿಸಿ, ಎಚ್ಚರಿಕೆಯ ಸೂಚನೆಗಳನ್ನು ಗುರುತಿಸಿ.",
-"🔎 ಸಾಲದ ಆಫರ್ ಪರಿಶೀಲಿಸಿ","ಬ್ಯಾಂಕ್ / ಸಾಲದಾತರ ಹೆಸರು","ಬ್ಯಾಂಕ್ ಅಥವಾ ಸಾಲದ ಆ್ಯಪ್ ಹೆಸರು ನಮೂದಿಸಿ",
-"ಸಾಲದ ಆಫರ್ ವಿವರಗಳು","ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ. ಪಾಸ್‌ವರ್ಡ್, OTP ಅಥವಾ ಖಾತೆ ಸಂಖ್ಯೆ ಬೇಡ.",
-"ಶುಲ್ಕಗಳು ಸ್ಪಷ್ಟವಾಗಿವೆಯೇ?","ಖಚಿತವಿಲ್ಲ","ಹೌದು, ಸ್ಪಷ್ಟವಾಗಿದೆ","ಇಲ್ಲ, ಅಸ್ಪಷ್ಟವಾಗಿದೆ",
-"ಸಾಲದಾತರ ಪರಿಶೀಲನೆ","ಪರಿಶೀಲಿಸಿಲ್ಲ","ಅಧಿಕೃತ ಮೂಲಗಳಿಂದ ಪರಿಶೀಲಿಸಲಾಗಿದೆ","ಅನುಮಾನಾಸ್ಪದ / ಪರಿಶೀಲಿಸಿಲ್ಲ",
-"ಸಾಲದ ಮೊದಲು ಮುಂಗಡ ಹಣ ಕೇಳಲಾಗುತ್ತಿದೆಯೇ?","ಇಲ್ಲ","ಹೌದು","ಸಾಲದ ಸುರಕ್ಷತೆ ಪರಿಶೀಲಿಸಿ",
-"ಇದು ಪ್ರಾಥಮಿಕ ಪರಿಶೀಲನೆ ಮಾತ್ರ; ಹಣಕಾಸು ಸಲಹೆಯಲ್ಲ. ಗೌಪ್ಯ ಮಾಹಿತಿ ನಮೂದಿಸಬೇಡಿ.",
-"ಪ್ರಾಥಮಿಕ ಪರಿಶೀಲನೆ","🚩 ಎಚ್ಚರಿಕೆಯ ಸೂಚನೆಗಳು","✅ ಸುರಕ್ಷಿತ ಕ್ರಮಗಳು","WhatsApp ನಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಿ",
-"🚩 ಅಪಾಯದ ಸೂಚನೆಗಳು","ಮುಂಗಡ ಶುಲ್ಕ, ಒತ್ತಡ, ಅಸ್ಪಷ್ಟ ನಿಯಮಗಳು ಮತ್ತು OTP/PIN ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆ ಇರಲಿ.",
-"🟢 ಸುರಕ್ಷಿತ ಸಾಲ","ಸಾಲದಾತರನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ನಿಯಮಗಳನ್ನು ಓದಿ.",
-"🛡️ ಸಾಲ ಸ್ವೀಕರಿಸುವ ಮೊದಲು",
-"ಅಧಿಕೃತ ಮೂಲಗಳಿಂದ ಪರಿಶೀಲಿಸಿ.|ಸಾಲದ ಒಪ್ಪಂದ ಮತ್ತು ಶುಲ್ಕಗಳನ್ನು ಓದಿ.|OTP, PIN ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಹಂಚಿಕೊಳ್ಳಬೇಡಿ.|ಅನುಮಾನಾಸ್ಪದ ಮುಂಗಡ ಶುಲ್ಕ ಪಾವತಿಸಬೇಡಿ.|ಅನುಮಾನವಿದ್ದರೆ ಬ್ಯಾಂಕ್ ಅಥವಾ ಸೈಬರ್ ಅಪರಾಧ ಅಧಿಕಾರಿಗಳನ್ನು ಸಂಪರ್ಕಿಸಿ.",
-"LoanShield AI · ಪ್ರಾಥಮಿಕ ಪರಿಶೀಲನೆ ಮಾತ್ರ. ಖಾತರಿಯಲ್ಲ.",
-"ಸಾಲದಾತರನ್ನು ಪರಿಶೀಲಿಸಲಾಗಲಿಲ್ಲ.|ಸ್ವತಂತ್ರವಾಗಿ ಪರಿಶೀಲಿಸಿ.|ಅಧಿಕೃತವಾಗಿ ಪರಿಶೀಲಿಸಿದ್ದಾಗಿ ತಿಳಿಸಿದ್ದೀರಿ.|ಶುಲ್ಕಗಳು ಸ್ಪಷ್ಟವಾಗಿಲ್ಲ.|ಎಲ್ಲಾ ಶುಲ್ಕ ಪರಿಶೀಲಿಸಿ.|ಶುಲ್ಕಗಳು ಸ್ಪಷ್ಟವಾಗಿವೆ.|ಮುಂಗಡ ಪಾವತಿ ಬೇಡಿಕೆ ಪರಿಶೀಲಿಸಿ.|ಮುಂಗಡ ಹಣ ಕೇಳಲಾಗುತ್ತಿದೆಯೇ ನೋಡಿ.|ಮುಂಗಡ ಹಣ ಕೇಳಿಲ್ಲ ಎಂದು ತಿಳಿಸಿದ್ದೀರಿ.|ಸಂದೇಶದಲ್ಲಿ ಅನುಮಾನಾಸ್ಪದ ಬೇಡಿಕೆ ಇರಬಹುದು.|ಹೆಚ್ಚಿನ ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ.|ಅಪಾಯದ ಸೂಚನೆಗಳು ಕಾಣಲಿಲ್ಲ; ಪರಿಶೀಲನೆ ಮುಖ್ಯ.|ಅಧಿಕೃತ ಮೂಲಗಳಿಂದ ಪರಿಶೀಲಿಸಿ.|ಪ್ರಾಥಮಿಕ ಅಂಕ, ಖಾತರಿಯಲ್ಲ.|ಈ ಅಂಕ ಖಾತರಿಯಲ್ಲ.|ಪ್ರಾಥಮಿಕ ವರದಿ|ಸಾಲದಾತ: |ಪರಿಶೀಲನಾ ಅಂಕ: |LoanShield AI ವರದಿ"
-],
-gu:[
-"લોન લેતા પહેલાં પોતાને સુરક્ષિત રાખો","લોનની ઑફર તપાસો અને ચેતવણીનાં સંકેતો ઓળખો.",
-"🔎 લોનની ઑફર તપાસો","બૅન્ક / ધિરાણકર્તાનું નામ","બૅન્ક અથવા લોન ઍપનું નામ દાખલ કરો",
-"લોન ઑફરની વિગતો","વિગતો લખો. પાસવર્ડ, OTP અથવા ખાતા નંબર ન આપો.",
-"શું ફી સ્પષ્ટ છે?","ખાતરી નથી","હા, સ્પષ્ટ છે","ના, અસ્પષ્ટ છે",
-"ધિરાણકર્તાની ચકાસણી","ચકાસ્યું નથી","સત્તાવાર સ્ત્રોતોથી ચકાસ્યું","શંકાસ્પદ / ચકાસ્યું નથી",
-"શું લોન પહેલાં આગોતરી ચુકવણી માંગે છે?","ના","હા","લોનની સુરક્ષા તપાસો",
-"આ પ્રાથમિક તપાસ છે, નાણાકીય સલાહ નથી. ગુપ્ત માહિતી દાખલ કરશો નહીં.",
-"પ્રાથમિક તપાસ","🚩 ચેતવણીનાં સંકેતો","✅ સુરક્ષિત પગલાં","WhatsApp પર શેર કરો",
-"🚩 જોખમનાં સંકેતો","આગોતરી ફી, દબાણ, અસ્પષ્ટ શરતો અને OTP/PIN માગવાથી સાવચેત રહો.",
-"🟢 સુરક્ષિત ઉધાર","ધિરાણકર્તાની ચકાસણી કરો અને શરતો વાંચો.",
-"🛡️ લોન સ્વીકારતાં પહેલાં",
-"સત્તાવાર સ્ત્રોતોથી ચકાસો.|લોન કરાર અને બધી ફી વાંચો.|OTP, PIN અથવા પાસવર્ડ શેર ન કરો.|શંકાસ્પદ આગોતરી ફી ન ચૂકવો.|શંકા હોય તો બૅન્ક અથવા સાયબર ક્રાઇમ અધિકારીઓનો સંપર્ક કરો.",
-"LoanShield AI · પ્રાથમિક તપાસ, સુરક્ષાની ખાતરી નથી.",
-"ધિરાણકર્તાની ચકાસણી થઈ શકી નથી.|સ્વતંત્ર ચકાસણી કરો.|સત્તાવાર ચકાસણી થઈ હોવાનું જણાવ્યું.|ફી સ્પષ્ટ નથી.|બધી ફી તપાસો.|ફી સ્પષ્ટ છે.|આગોતરી ચુકવણી તપાસો.|આગોતરી પૈસા માંગે છે કે નહીં જુઓ.|આગોતરી ચુકવણી માગી નથી એમ જણાવ્યું.|સંદેશમાં શંકાસ્પદ માંગ હોઈ શકે છે.|વધુ વિગતો દાખલ કરો.|જોખમ સંકેતો મળ્યા નથી; છતાં ચકાસણી જરૂરી છે.|સત્તાવાર સ્ત્રોતોથી તપાસો.|પ્રાથમિક સ્કોર, ખાતરી નથી.|આ સ્કોર ખાતરી નથી.|પ્રાથમિક રિપોર્ટ|ધિરાણકર્તા: |ચેકલિસ્ટ સ્કોર: |LoanShield AI રિપોર્ટ"
-],
-bn:[
-"ঋণ নেওয়ার আগে নিজেকে সুরক্ষিত রাখুন","ঋণের প্রস্তাব যাচাই করুন এবং সতর্কতার লক্ষণ চিনুন।",
-"🔎 ঋণের প্রস্তাব যাচাই করুন","ব্যাঙ্ক / ঋণদাতার নাম","ব্যাঙ্ক বা ঋণ অ্যাপের নাম লিখুন",
-"ঋণের প্রস্তাবের বিবরণ","বিবরণ লিখুন। পাসওয়ার্ড, OTP বা অ্যাকাউন্ট নম্বর দেবেন না।",
-"ফি কি স্পষ্ট?","নিশ্চিত নই","হ্যাঁ, স্পষ্ট","না, অস্পষ্ট",
-"ঋণদাতার যাচাই","যাচাই করা হয়নি","সরকারি সূত্র থেকে যাচাই করা","সন্দেহজনক / যাচাই হয়নি",
-"ঋণ দেওয়ার আগে কি অগ্রিম টাকা চাওয়া হচ্ছে?","না","হ্যাঁ","ঋণের নিরাপত্তা যাচাই করুন",
-"এটি প্রাথমিক যাচাই, আর্থিক পরামর্শ নয়। গোপন তথ্য দেবেন না।",
-"প্রাথমিক পর্যালোচনা","🚩 সতর্কতার লক্ষণ","✅ নিরাপদ পদক্ষেপ","WhatsApp-এ শেয়ার করুন",
-"🚩 ঝুঁকির লক্ষণ","আগাম ফি, চাপ, অস্পষ্ট শর্ত এবং OTP/PIN চাওয়ার বিষয়ে সতর্ক থাকুন।",
-"🟢 নিরাপদ ঋণ","ঋণদাতাকে যাচাই করুন এবং সব শর্ত পড়ুন।",
-"🛡️ ঋণ গ্রহণের আগে",
-"সরকারি সূত্র থেকে যাচাই করুন।|ঋণচুক্তি ও সব ফি পড়ুন।|OTP, PIN বা পাসওয়ার্ড শেয়ার করবেন না।|সন্দেহজনক অগ্রিম ফি দেবেন না।|সন্দেহ হলে ব্যাঙ্ক বা সাইবার অপরাধ কর্তৃপক্ষের সঙ্গে যোগাযোগ করুন।",
-"LoanShield AI · প্রাথমিক যাচাই, নিরাপত্তার নিশ্চয়তা নয়।",
-"ঋণদাতাকে যাচাই করা যায়নি।|নিজে যাচাই করুন।|সরকারি সূত্র থেকে যাচাই হয়েছে বলে জানিয়েছেন।|ফি স্পষ্ট নয়।|সব ফি যাচাই করুন।|ফি স্পষ্ট।|আগাম টাকা চাওয়া হলে যাচাই করুন।|অগ্রিম টাকা চাওয়া হচ্ছে কি না দেখুন।|অগ্রিম টাকা চাওয়া হয়নি বলে জানিয়েছেন।|বার্তায় সন্দেহজনক দাবি থাকতে পারে।|আরও তথ্য দিন।|ঝুঁকির লক্ষণ পাওয়া যায়নি; তবুও যাচাই জরুরি।|সরকারি সূত্র থেকে যাচাই করুন।|প্রাথমিক স্কোর, নিশ্চয়তা নয়।|এই স্কোর নিরাপত্তার নিশ্চয়তা নয়।|প্রাথমিক রিপোর্ট|ঋণদাতা: |যাচাইয়ের স্কোর: |LoanShield AI রিপোর্ট"
-],
-ta:[
-"கடன் பெறுவதற்கு முன் உங்களைப் பாதுகாத்துக் கொள்ளுங்கள்","கடன் சலுகைகளைச் சரிபார்த்து எச்சரிக்கை அறிகுறிகளை அறியுங்கள்.",
-"🔎 கடன் சலுகையைச் சரிபார்க்கவும்","வங்கி / கடன் வழங்குநர் பெயர்","வங்கி அல்லது கடன் செயலியின் பெயரை உள்ளிடவும்",
-"கடன் சலுகை விவரங்கள்","விவரங்களை உள்ளிடவும். கடவுச்சொல், OTP அல்லது கணக்கு எண்ணைச் சேர்க்க வேண்டாம்.",
-"கட்டணங்கள் தெளிவாக உள்ளனவா?","தெரியவில்லை","ஆம், தெளிவாக உள்ளது","இல்லை, தெளிவற்றது",
-"கடன் வழங்குநர் சரிபார்ப்பு","சரிபார்க்கப்படவில்லை","அதிகாரப்பூர்வமாக சரிபார்க்கப்பட்டது","சந்தேகத்திற்குரியது / சரிபார்க்கப்படவில்லை",
-"கடனுக்கு முன் முன்பணம் கேட்கப்படுகிறதா?","இல்லை","ஆம்","கடன் பாதுகாப்பைச் சரிபார்க்கவும்",
-"இது ஆரம்பநிலைச் சரிபார்ப்பு மட்டுமே; நிதி ஆலோசனை அல்ல. ரகசியத் தகவல்களை உள்ளிட வேண்டாம்.",
-"ஆரம்பநிலை மதிப்பாய்வு","🚩 எச்சரிக்கை அறிகுறிகள்","✅ பாதுகாப்பான நடவடிக்கைகள்","WhatsApp-ல் பகிரவும்",
-"🚩 ஆபத்து அறிகுறிகள்","முன்பணம், அழுத்தம், தெளிவற்ற விதிமுறைகள் மற்றும் OTP/PIN கேட்பது குறித்து எச்சரிக்கையாக இருங்கள்.",
-"🟢 பாதுகாப்பான கடன்","கடன் வழங்குநரைச் சரிபார்த்து விதிமுறைகளைப் படிக்கவும்.",
-"🛡️ கடனை ஏற்கும் முன்",
-"அதிகாரப்பூர்வ ஆதாரங்களில் சரிபார்க்கவும்.|கடன் ஒப்பந்தம் மற்றும் கட்டணங்களைப் படிக்கவும்.|OTP, PIN அல்லது கடவுச்சொல்லைப் பகிர வேண்டாம்.|சந்தேகத்திற்குரிய முன்பணம் செலுத்த வேண்டாம்.|சந்தேகம் இருந்தால் வங்கி அல்லது சைபர் குற்ற அதிகாரிகளைத் தொடர்புகொள்ளவும்.",
-"LoanShield AI · ஆரம்பநிலைச் சரிபார்ப்பு; பாதுகாப்பு உத்தரவாதமல்ல.",
-"கடன் வழங்குநரைச் சரிபார்க்க முடியவில்லை.|தனியாகச் சரிபார்க்கவும்.|அதிகாரப்பூர்வமாகச் சரிபார்த்ததாகக் கூறியுள்ளீர்கள்.|கட்டணங்கள் தெளிவாக இல்லை.|அனைத்து கட்டணங்களையும் சரிபார்க்கவும்.|கட்டணங்கள் தெளிவாக உள்ளன.|முன்பணம் கேட்பதைச் சரிபார்க்கவும்.|முன்பணம் கேட்கப்படுகிறதா எனப் பார்க்கவும்.|முன்பணம் கேட்கப்படவில்லை எனக் கூறியுள்ளீர்கள்.|செய்தியில் சந்தேகமான கோரிக்கை இருக்கலாம்.|மேலும் விவரங்களை உள்ளிடவும்.|ஆபத்து அறிகுறிகள் இல்லை; இருப்பினும் சரிபார்ப்பு அவசியம்.|அதிகாரப்பூர்வ ஆதாரங்களில் சரிபார்க்கவும்.|ஆரம்பநிலை மதிப்பெண், உத்தரவாதமல்ல.|இந்த மதிப்பெண் உத்தரவாதமல்ல.|ஆரம்பநிலை அறிக்கை|கடன் வழங்குநர்: |சரிபார்ப்பு மதிப்பெண்: |LoanShield AI அறிக்கை"
-],
-te:[
-"రుణం తీసుకునే ముందు మిమ్మల్ని మీరు రక్షించుకోండి","రుణ ఆఫర్లను పరిశీలించి హెచ్చరిక సంకేతాలను గుర్తించండి.",
-"🔎 రుణ ఆఫర్‌ను పరిశీలించండి","బ్యాంక్ / రుణదాత పేరు","బ్యాంక్ లేదా రుణ యాప్ పేరు నమోదు చేయండి",
-"రుణ ఆఫర్ వివరాలు","వివరాలు నమోదు చేయండి. పాస్‌వర్డ్, OTP లేదా ఖాతా నంబర్ ఇవ్వవద్దు.",
-"ఫీజులు స్పష్టంగా ఉన్నాయా?","తెలియదు","అవును, స్పష్టంగా ఉన్నాయి","కాదు, అస్పష్టంగా ఉన్నాయి",
-"రుణదాత ధృవీకరణ","ధృవీకరించలేదు","అధికారికంగా ధృవీకరించారు","అనుమానాస్పదం / ధృవీకరించలేదు",
-"రుణానికి ముందు ముందస్తు చెల్లింపు అడుగుతున్నారా?","కాదు","అవును","రుణ భద్రతను తనిఖీ చేయండి",
-"ఇది ప్రాథమిక తనిఖీ మాత్రమే; ఆర్థిక సలహా కాదు. రహస్య సమాచారాన్ని ఇవ్వవద్దు.",
-"ప్రాథమిక సమీక్ష","🚩 హెచ్చరిక సంకేతాలు","✅ సురక్షిత చర్యలు","WhatsAppలో పంచుకోండి",
-"🚩 ప్రమాద సంకేతాలు","ముందస్తు ఫీజులు, ఒత్తిడి, అస్పష్ట నిబంధనలు, OTP/PIN అడగడం పట్ల జాగ్రత్తగా ఉండండి.",
-"🟢 సురక్షిత రుణం","రుణదాతను ధృవీకరించి నిబంధనలు చదవండి.",
-"🛡️ రుణాన్ని అంగీకరించే ముందు",
-"అధికారిక వనరుల ద్వారా ధృవీకరించండి.|రుణ ఒప్పందం, ఫీజులు చదవండి.|OTP, PIN లేదా పాస్‌వర్డ్ పంచుకోవద్దు.|అనుమానాస్పద ముందస్తు ఫీజులు చెల్లించవద్దు.|అనుమానం ఉంటే బ్యాంక్ లేదా సైబర్ క్రైమ్ అధికారులను సంప్రదించండి.",
-"LoanShield AI · ప్రాథమిక తనిఖీ మాత్రమే; భద్రతకు హామీ కాదు.",
-"రుణదాతను ధృవీకరించలేకపోయారు.|స్వతంత్రంగా ధృవీకరించండి.|అధికారికంగా ధృవీకరించినట్లు తెలిపారు.|ఫీజులు స్పష్టంగా లేవు.|అన్ని ఫీజులు తనిఖీ చేయండి.|ఫీజులు స్పష్టంగా ఉన్నాయి.|ముందస్తు చెల్లింపు డిమాండ్‌ను పరిశీలించండి.|ముందస్తు చెల్లింపు అడుగుతున్నారా చూడండి.|ముందస్తు చెల్లింపు అడగలేదని తెలిపారు.|సందేశంలో అనుమానాస్పద అభ్యర్థన ఉండవచ్చు.|మరిన్ని వివరాలు నమోదు చేయండి.|ప్రమాద సూచనలు లేవు; అయినా ధృవీకరణ ముఖ్యం.|అధికారిక వనరుల ద్వారా తనిఖీ చేయండి.|ప్రాథమిక స్కోరు, హామీ కాదు.|ఈ స్కోరు హామీ కాదు.|ప్రాథమిక నివేదిక|రుణదాత: |తనిఖీ స్కోరు: |LoanShield AI నివేదిక"
-],
-mr:[
-"कर्ज घेण्यापूर्वी स्वतःचे संरक्षण करा","कर्जाच्या ऑफर तपासा आणि धोक्याची चिन्हे ओळखा.",
-"🔎 कर्जाच्या ऑफरची तपासणी","बँक / कर्जदात्याचे नाव","बँक किंवा कर्ज अॅपचे नाव लिहा",
-"कर्जाच्या ऑफरचे तपशील","तपशील लिहा. पासवर्ड, OTP किंवा खाते क्रमांक टाकू नका.",
-"शुल्क स्पष्टपणे सांगितले आहे का?","खात्री नाही","होय, स्पष्ट आहे","नाही, अस्पष्ट आहे",
-"कर्जदात्याची पडताळणी","पडताळणी केलेली नाही","अधिकृत स्रोतांद्वारे पडताळले","संशयास्पद / पडताळणी नाही",
-"कर्ज मिळण्यापूर्वी आगाऊ पैसे मागितले जात आहेत का?","नाही","होय","कर्जाची सुरक्षितता तपासा",
-"ही प्राथमिक तपासणी आहे; आर्थिक सल्ला नाही. गोपनीय माहिती टाकू नका.",
-"प्राथमिक तपासणी","🚩 धोक्याची चिन्हे","✅ सुरक्षित पावले","WhatsApp वर शेअर करा",
-"🚩 धोक्याची चिन्हे","आगाऊ शुल्क, दबाव, अस्पष्ट अटी आणि OTP/PIN मागितल्यास सावध राहा.",
-"🟢 सुरक्षित कर्ज","कर्जदात्याची पडताळणी करा आणि सर्व अटी वाचा.",
-"🛡️ कर्ज स्वीकारण्यापूर्वी",
-"अधिकृत स्रोतांद्वारे पडताळणी करा.|कर्जाचा करार आणि सर्व शुल्क वाचा.|OTP, PIN किंवा पासवर्ड शेअर करू नका.|संशयास्पद आगाऊ शुल्क भरू नका.|संशय असल्यास बँक किंवा सायबर गुन्हे अधिकाऱ्यांशी संपर्क साधा.",
-"LoanShield AI · प्राथमिक तपासणी; सुरक्षिततेची हमी नाही.",
-"कर्जदात्याची पडताळणी करता आली नाही.|स्वतंत्र पडताळणी करा.|अधिकृत स्रोतांद्वारे पडताळणी केल्याचे सांगितले.|शुल्क स्पष्ट नाही.|सर्व शुल्क तपासा.|शुल्क स्पष्ट आहेत.|आगाऊ पैसे मागितल्यास तपासा.|आगाऊ पैसे मागितले आहेत का ते पाहा.|आगाऊ पैसे मागितले नसल्याचे सांगितले.|संदेशात संशयास्पद मागणी असू शकते.|अधिक तपशील भरा.|धोक्याची चिन्हे आढळली नाहीत; तरी पडताळणी महत्त्वाची आहे.|अधिकृत स्रोतांद्वारे तपासा.|प्राथमिक गुण, हमी नाही.|हे गुण हमी नाहीत.|प्राथमिक अहवाल|कर्जदाता: |तपासणी गुण: |LoanShield AI अहवाल"
-]
+const LANG_KEY="loanshield-language",THEME_KEY="loanshield-dark-mode";
+const messages={
+en:{
+heroTitle:"Protect Yourself Before Taking a Loan",heroText:"Review loan offers, identify warning signs, and make informed borrowing decisions.",reviewTitle:"🔎 Review a Loan Offer",companyLabel:"Bank / Lender Name",companyPH:"Enter bank or lending app name",offerLabel:"Loan Offer or Message",offerPH:"Paste the offer or suspicious message here. Remove personal details first.",feeLabel:"Are fees clearly explained?",unknown:"Not sure",feeYes:"Yes, clearly explained",feeNo:"No, unclear or hidden",regLabel:"Lender verification status",verified:"Independently verified",unverified:"Unverified / suspicious",advanceLabel:"Is advance payment demanded before disbursal?",no:"No",yes:"Yes",reviewBtn:"Check Loan Safety",privacyNote:"Your form details are processed in this page and are not saved by this app. Avoid entering account numbers, Aadhaar, passwords, PINs or OTPs.",resultTitle:"Your Preliminary Review",redTitle:"🚩 Warning Signs",greenTitle:"✅ Recommended Actions",scoreDisclaimer:"This is a preliminary checklist, not a verified fraud detector. A low score does not prove that a lender is legitimate.",shareBtn:"Share on WhatsApp",printBtn:"Print / Save PDF",resetBtn:"Clear Form",redCardTitle:"🚩 Common Red Flags",redCardText:"Upfront payment demands, guaranteed approval, pressure tactics, and requests for OTPs or PINs.",greenCardTitle:"🟢 Safer Borrowing",greenCardText:"Verify the lender independently, read the agreement, compare the APR and fees, and keep copies.",verifyTitle:"🏦 Verify a Lender",verifyText:"Use official sources to check the legal lender name and whether the institution is authorised. A website or app logo alone is not proof.",rbiLink:"Open official RBI website ↗",sachetLink:"RBI Sachet portal ↗",verifyNote:"These links provide official resources; this app does not directly verify any lender or guarantee a search result.",emiTitle:"🧮 EMI and Loan Cost Calculator",emiText:"Estimate monthly repayments. Enter the annual interest rate and loan term.",principalLabel:"Loan amount (₹)",rateLabel:"Annual interest (%)",monthsLabel:"Loan term (months)",processingLabel:"Processing fee (₹)",emiBtn:"Calculate EMI",monthlyEMI:"Monthly EMI",totalInterest:"Total interest",totalRepay:"Total repayments",totalCost:"Repayments + processing fee",emiNote:"Estimate only. Actual lender calculations, taxes, insurance, variable rates and other charges may differ.",stepsTitle:"🛡️ Before You Accept a Loan",step1:"Verify the lender through official sources.",step2:"Read the full agreement, APR and all fees.",step3:"Never share OTPs, PINs or banking passwords.",step4:"Do not pay suspicious advance fees to release a loan.",step5:"Report suspected fraud to your bank and relevant authorities.",footerText:"LoanShield AI · Awareness tool only. No financial or safety guarantee.",high:"High risk indicators",medium:"Caution advised",low:"Fewer warning indicators",noRisk:"No major selected warning indicators",scoreLabel:"Preliminary indicator score — not a probability of fraud.",enter:"Enter a lender name or offer message to review.",lenderUnverified:"The lender is marked unverified. Independently confirm its legal name and authorisation.",lenderUnknown:"The lender's authorisation has not been confirmed.",lenderVerified:"You marked the lender as verified. Check that verification using an independent official source.",feesBad:"Fees are reported as unclear or hidden. Request a written, itemised schedule.",feesUnknown:"Fee details are unknown. Read the complete loan agreement.",feesGood:"Fees are reported as clearly explained. Confirm the written terms.",advanceBad:"An advance payment is reported. Treat requests to pay money to release a loan as a serious warning sign.",advanceUnknown:"Advance-payment requirements are unknown. Ask for written terms and independently verify any demand.",advanceGood:"No advance payment demand was selected. This does not establish legitimacy.",keyword:"The message contains wording often associated with risky loan offers. Review it carefully.",actionVerify:"Verify the lender independently using official regulatory sources.",actionNoOTP:"Never share an OTP, PIN, password, or remote-access code.",actionFee:"Do not pay a suspicious fee to unlock or release a loan.",actionContact:"If money has been lost or fraud is suspected, contact your bank promptly and report it to the relevant cybercrime authorities.",actionTerms:"Compare the APR, repayment schedule, penalties and all charges before agreeing.",invalid:"Please enter valid positive loan amount, term, and non-negative fees. Interest must be 0–100%.",whatsTitle:"LoanShield AI preliminary review",reportDisclaimer:"Preliminary checklist only; not proof of fraud or legitimacy."
+},
+hi:{
+heroTitle:"लोन लेने से पहले खुद को सुरक्षित रखें",heroText:"लोन ऑफ़र जाँचें, खतरे के संकेत पहचानें और सोच-समझकर निर्णय लें।",reviewTitle:"🔎 लोन ऑफ़र की जाँच",companyLabel:"बैंक / ऋणदाता का नाम",companyPH:"बैंक या लोन ऐप का नाम लिखें",offerLabel:"लोन ऑफ़र या संदेश",offerPH:"संदेश यहाँ डालें। पहले निजी जानकारी हटा दें।",feeLabel:"क्या शुल्क स्पष्ट हैं?",unknown:"पता नहीं",feeYes:"हाँ, स्पष्ट हैं",feeNo:"नहीं, अस्पष्ट या छिपे हुए",regLabel:"ऋणदाता सत्यापन",verified:"स्वतंत्र रूप से सत्यापित",unverified:"सत्यापित नहीं / संदिग्ध",advanceLabel:"क्या लोन से पहले अग्रिम भुगतान माँगा जा रहा है?",no:"नहीं",yes:"हाँ",reviewBtn:"लोन की सुरक्षा जाँचें",privacyNote:"आपकी जानकारी इस पेज पर संसाधित होती है और ऐप में सहेजी नहीं जाती। खाता नंबर, आधार, पासवर्ड, PIN या OTP न डालें।",resultTitle:"प्रारंभिक समीक्षा",redTitle:"🚩 खतरे के संकेत",greenTitle:"✅ सुझाए गए कदम",scoreDisclaimer:"यह शुरुआती जाँच है, प्रमाणित धोखाधड़ी पहचान नहीं। कम स्कोर से ऋणदाता की वैधता सिद्ध नहीं होती।",shareBtn:"WhatsApp पर साझा करें",printBtn:"प्रिंट / PDF सहेजें",resetBtn:"फ़ॉर्म साफ़ करें",redCardTitle:"🚩 आम खतरे",redCardText:"अग्रिम भुगतान, पक्की मंज़ूरी के दावे, दबाव और OTP या PIN माँगना।",greenCardTitle:"🟢 सुरक्षित उधार",greenCardText:"ऋणदाता की स्वतंत्र जाँच करें, समझौता पढ़ें और सभी शुल्क देखें।",verifyTitle:"🏦 ऋणदाता सत्यापित करें",verifyText:"आधिकारिक स्रोतों से कानूनी नाम और प्राधिकरण जाँचें। केवल वेबसाइट या लोगो प्रमाण नहीं है।",rbiLink:"आधिकारिक RBI वेबसाइट ↗",sachetLink:"RBI Sachet पोर्टल ↗",verifyNote:"ये आधिकारिक संसाधन हैं। ऐप स्वयं किसी ऋणदाता को सत्यापित नहीं करता।",emiTitle:"🧮 EMI और ऋण लागत कैलकुलेटर",emiText:"मासिक किस्त का अनुमान लगाएँ। वार्षिक ब्याज और अवधि भरें।",principalLabel:"लोन राशि (₹)",rateLabel:"वार्षिक ब्याज (%)",monthsLabel:"अवधि (महीने)",processingLabel:"प्रोसेसिंग शुल्क (₹)",emiBtn:"EMI की गणना करें",monthlyEMI:"मासिक EMI",totalInterest:"कुल ब्याज",totalRepay:"कुल भुगतान",totalCost:"भुगतान + प्रोसेसिंग शुल्क",emiNote:"यह अनुमान है। वास्तविक गणना और अन्य शुल्क अलग हो सकते हैं।",stepsTitle:"🛡️ लोन लेने से पहले",step1:"आधिकारिक स्रोतों से ऋणदाता की जाँच करें।",step2:"समझौता, APR और सभी शुल्क पढ़ें।",step3:"OTP, PIN या बैंक पासवर्ड साझा न करें।",step4:"लोन जारी करने के लिए संदिग्ध अग्रिम शुल्क न दें।",step5:"धोखाधड़ी का संदेह हो तो बैंक और संबंधित अधिकारियों से संपर्क करें।",footerText:"LoanShield AI · केवल जागरूकता उपकरण। सुरक्षा की गारंटी नहीं।"
+},
+ur:{
+heroTitle:"قرض لینے سے پہلے خود کو محفوظ رکھیں",heroText:"قرض کی پیشکش دیکھیں اور خطرے کی علامات پہچانیں۔",reviewTitle:"🔎 قرض کی پیشکش کا جائزہ",companyLabel:"بینک / قرض دہندہ کا نام",companyPH:"بینک یا قرض ایپ کا نام لکھیں",offerLabel:"قرض کی پیشکش یا پیغام",offerPH:"پیغام یہاں درج کریں؛ پہلے ذاتی معلومات ہٹا دیں۔",feeLabel:"کیا فیس واضح ہے؟",unknown:"یقین نہیں",feeYes:"ہاں، واضح ہے",feeNo:"نہیں، غیر واضح یا پوشیدہ",regLabel:"قرض دہندہ کی تصدیق",verified:"آزادانہ طور پر تصدیق شدہ",unverified:"غیر تصدیق شدہ / مشکوک",advanceLabel:"کیا قرض سے پہلے پیشگی رقم مانگی جا رہی ہے؟",no:"نہیں",yes:"ہاں",reviewBtn:"قرض کی حفاظت جانچیں",privacyNote:"معلومات اسی صفحے پر استعمال ہوتی ہیں اور محفوظ نہیں کی جاتیں۔ اکاؤنٹ نمبر، پاس ورڈ، PIN یا OTP نہ لکھیں۔",resultTitle:"ابتدائی جائزہ",redTitle:"🚩 خطرے کی علامات",greenTitle:"✅ تجویز کردہ اقدامات",scoreDisclaimer:"یہ ابتدائی فہرست ہے، تصدیق شدہ فراڈ ڈیٹیکٹر نہیں۔",shareBtn:"WhatsApp پر شیئر کریں",printBtn:"پرنٹ / PDF محفوظ کریں",resetBtn:"فارم صاف کریں",redCardTitle:"🚩 عام خطرات",redCardText:"پیشگی رقم، فوری منظوری کے دعوے اور OTP یا PIN مانگنا۔",greenCardTitle:"🟢 محفوظ قرض",greenCardText:"قرض دہندہ کی آزادانہ تصدیق کریں اور شرائط پڑھیں۔",verifyTitle:"🏦 قرض دہندہ کی تصدیق",verifyText:"سرکاری ذرائع سے قانونی نام اور اجازت کی تصدیق کریں۔",rbiLink:"سرکاری RBI ویب سائٹ ↗",sachetLink:"RBI Sachet پورٹل ↗",verifyNote:"ایپ خود قرض دہندہ کی تصدیق نہیں کرتی۔",emiTitle:"🧮 EMI اور قرض کا حساب",emiText:"ماہانہ قسط کا اندازہ لگائیں۔",principalLabel:"قرض کی رقم (₹)",rateLabel:"سالانہ سود (%)",monthsLabel:"مدت (مہینے)",processingLabel:"پروسیسنگ فیس (₹)",emiBtn:"EMI حساب کریں",monthlyEMI:"ماہانہ EMI",totalInterest:"کل سود",totalRepay:"کل ادائیگی",totalCost:"ادائیگی + فیس",emiNote:"یہ صرف اندازہ ہے۔ اصل رقم مختلف ہو سکتی ہے۔",stepsTitle:"🛡️ قرض لینے سے پہلے",step1:"سرکاری ذرائع سے تصدیق کریں۔",step2:"معاہدہ اور تمام فیس پڑھیں۔",step3:"OTP، PIN یا پاس ورڈ نہ بتائیں۔",step4:"مشکوک پیشگی فیس ادا نہ کریں۔",step5:"فراڈ کا شبہ ہو تو بینک سے رابطہ کریں۔",footerText:"LoanShield AI · صرف آگاہی کے لیے؛ ضمانت نہیں۔"
+},
+pa:{
+heroTitle:"ਕਰਜ਼ਾ ਲੈਣ ਤੋਂ ਪਹਿਲਾਂ ਆਪਣੀ ਸੁਰੱਖਿਆ ਕਰੋ",heroText:"ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਜਾਂਚੋ ਅਤੇ ਖ਼ਤਰੇ ਦੇ ਸੰਕੇਤ ਪਛਾਣੋ।",reviewTitle:"🔎 ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਦੀ ਜਾਂਚ",companyLabel:"ਬੈਂਕ / ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦਾ ਨਾਮ",companyPH:"ਬੈਂਕ ਜਾਂ ਕਰਜ਼ਾ ਐਪ ਦਾ ਨਾਮ ਲਿਖੋ",offerLabel:"ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਜਾਂ ਸੁਨੇਹਾ",offerPH:"ਸੁਨੇਹਾ ਪਾਓ; ਪਹਿਲਾਂ ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਹਟਾਓ।",feeLabel:"ਕੀ ਫੀਸਾਂ ਸਪਸ਼ਟ ਹਨ?",unknown:"ਪਤਾ ਨਹੀਂ",feeYes:"ਹਾਂ, ਸਪਸ਼ਟ ਹਨ",feeNo:"ਨਹੀਂ, ਅਸਪਸ਼ਟ ਹਨ",regLabel:"ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ",verified:"ਸੁਤੰਤਰ ਤੌਰ 'ਤੇ ਪੁਸ਼ਟੀ ਕੀਤੀ",unverified:"ਅਪੁਸ਼ਟ / ਸ਼ੱਕੀ",advanceLabel:"ਕੀ ਪਹਿਲਾਂ ਅਗਾਊਂ ਪੈਸੇ ਮੰਗੇ ਜਾਂਦੇ ਹਨ?",no:"ਨਹੀਂ",yes:"ਹਾਂ",reviewBtn:"ਕਰਜ਼ੇ ਦੀ ਸੁਰੱਖਿਆ ਜਾਂਚੋ",privacyNote:"ਜਾਣਕਾਰੀ ਇਸ ਪੰਨੇ 'ਤੇ ਹੀ ਵਰਤੀ ਜਾਂਦੀ ਹੈ ਅਤੇ ਸੰਭਾਲੀ ਨਹੀਂ ਜਾਂਦੀ। ਗੁਪਤ ਜਾਣਕਾਰੀ ਨਾ ਪਾਓ।",resultTitle:"ਮੁੱਢਲੀ ਜਾਂਚ",redTitle:"🚩 ਖ਼ਤਰੇ ਦੇ ਸੰਕੇਤ",greenTitle:"✅ ਸਿਫ਼ਾਰਸ਼ੀ ਕਦਮ",scoreDisclaimer:"ਇਹ ਮੁੱਢਲੀ ਜਾਂਚ ਹੈ, ਪੱਕਾ ਧੋਖਾਧੜੀ ਪਤਾ ਕਰਨ ਵਾਲਾ ਸਾਧਨ ਨਹੀਂ।",shareBtn:"WhatsApp 'ਤੇ ਸਾਂਝਾ ਕਰੋ",printBtn:"ਪ੍ਰਿੰਟ / PDF ਸੇਵ ਕਰੋ",resetBtn:"ਫਾਰਮ ਸਾਫ਼ ਕਰੋ",redCardTitle:"🚩 ਆਮ ਖ਼ਤਰੇ",redCardText:"ਅਗਾਊਂ ਫੀਸ, ਪੱਕੀ ਮਨਜ਼ੂਰੀ ਦੇ ਦਾਅਵੇ ਅਤੇ OTP/PIN ਮੰਗਣਾ।",greenCardTitle:"🟢 ਸੁਰੱਖਿਅਤ ਕਰਜ਼ਾ",greenCardText:"ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਸ਼ਰਤਾਂ ਪੜ੍ਹੋ।",verifyTitle:"🏦 ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਜਾਂਚ",verifyText:"ਅਧਿਕਾਰਤ ਸਰੋਤਾਂ ਤੋਂ ਕਾਨੂੰਨੀ ਨਾਮ ਅਤੇ ਮਨਜ਼ੂਰੀ ਦੀ ਜਾਂਚ ਕਰੋ।",rbiLink:"ਅਧਿਕਾਰਤ RBI ਵੈੱਬਸਾਈਟ ↗",sachetLink:"RBI Sachet ਪੋਰਟਲ ↗",verifyNote:"ਇਹ ਐਪ ਆਪਣੇ ਆਪ ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ ਨਹੀਂ ਕਰਦੀ।",emiTitle:"🧮 EMI ਅਤੇ ਕਰਜ਼ਾ ਲਾਗਤ ਕੈਲਕੁਲੇਟਰ",emiText:"ਮਹੀਨਾਵਾਰ ਕਿਸ਼ਤ ਦਾ ਅੰਦਾਜ਼ਾ ਲਗਾਓ।",principalLabel:"ਕਰਜ਼ੇ ਦੀ ਰਕਮ (₹)",rateLabel:"ਸਾਲਾਨਾ ਵਿਆਜ (%)",monthsLabel:"ਮਿਆਦ (ਮਹੀਨੇ)",processingLabel:"ਪ੍ਰੋਸੈਸਿੰਗ ਫੀਸ (₹)",emiBtn:"EMI ਗਿਣੋ",monthlyEMI:"ਮਹੀਨਾਵਾਰ EMI",totalInterest:"ਕੁੱਲ ਵਿਆਜ",totalRepay:"ਕੁੱਲ ਭੁਗਤਾਨ",totalCost:"ਭੁਗਤਾਨ + ਫੀਸ",emiNote:"ਇਹ ਅੰਦਾਜ਼ਾ ਹੈ; ਅਸਲ ਰਕਮ ਵੱਖਰੀ ਹੋ ਸਕਦੀ ਹੈ।",stepsTitle:"🛡️ ਕਰਜ਼ਾ ਲੈਣ ਤੋਂ ਪਹਿਲਾਂ",step1:"ਅਧਿਕਾਰਤ ਸਰੋਤਾਂ ਤੋਂ ਜਾਂਚ ਕਰੋ।",step2:"ਸਮਝੌਤਾ ਅਤੇ ਸਾਰੀਆਂ ਫੀਸਾਂ ਪੜ੍ਹੋ।",step3:"OTP, PIN ਜਾਂ ਪਾਸਵਰਡ ਸਾਂਝੇ ਨਾ ਕਰੋ।",step4:"ਸ਼ੱਕੀ ਅਗਾਊਂ ਫੀਸ ਨਾ ਦਿਓ।",step5:"ਧੋਖਾਧੜੀ ਦਾ ਸ਼ੱਕ ਹੋਵੇ ਤਾਂ ਬੈਂਕ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।",footerText:"LoanShield AI · ਸਿਰਫ਼ ਜਾਗਰੂਕਤਾ ਲਈ; ਕੋਈ ਗਾਰੰਟੀ ਨਹੀਂ।"
+},
+ml:{
+heroTitle:"വായ്പ എടുക്കുന്നതിന് മുമ്പ് സുരക്ഷിതരാകൂ",heroText:"വായ്പാ ഓഫറുകൾ പരിശോധിച്ച് മുന്നറിയിപ്പ് സൂചനകൾ തിരിച്ചറിയുക.",reviewTitle:"🔎 വായ്പാ ഓഫർ പരിശോധിക്കുക",companyLabel:"ബാങ്ക് / വായ്പാദാതാവിന്റെ പേര്",companyPH:"ബാങ്കിന്റെയോ വായ്പാ ആപ്പിന്റെയോ പേര് നൽകുക",offerLabel:"വായ്പാ ഓഫർ അല്ലെങ്കിൽ സന്ദേശം",offerPH:"സന്ദേശം ചേർക്കുക; സ്വകാര്യ വിവരങ്ങൾ ആദ്യം നീക്കുക.",feeLabel:"ഫീസുകൾ വ്യക്തമായിട്ടുണ്ടോ?",unknown:"ഉറപ്പില്ല",feeYes:"അതെ, വ്യക്തമാണ്",feeNo:"ഇല്ല, വ്യക്തമല്ല",regLabel:"വായ്പാദാതാവിന്റെ പരിശോധന",verified:"സ്വതന്ത്രമായി സ്ഥിരീകരിച്ചു",unverified:"സ്ഥിരീകരിച്ചിട്ടില്ല / സംശയാസ്പദം",advanceLabel:"വായ്പയ്ക്ക് മുമ്പ് മുൻകൂർ പണം ആവശ്യപ്പെടുന്നുണ്ടോ?",no:"ഇല്ല",yes:"അതെ",reviewBtn:"വായ്പയുടെ സുരക്ഷ പരിശോധിക്കുക",privacyNote:"വിവരങ്ങൾ ഈ പേജിൽ മാത്രം ഉപയോഗിക്കുന്നു; സംരക്ഷിക്കുന്നില്ല. രഹസ്യ വിവരങ്ങൾ നൽകരുത്.",resultTitle:"പ്രാഥമിക പരിശോധന",redTitle:"🚩 മുന്നറിയിപ്പ് സൂചനകൾ",greenTitle:"✅ ശുപാർശ ചെയ്യുന്ന നടപടികൾ",scoreDisclaimer:"ഇത് പ്രാഥമിക പരിശോധന മാത്രമാണ്; തട്ടിപ്പ് കണ്ടെത്താനുള്ള ഉറപ്പുള്ള സംവിധാനം അല്ല.",shareBtn:"WhatsApp-ൽ പങ്കിടുക",printBtn:"പ്രിന്റ് / PDF",resetBtn:"ഫോം മായ്ക്കുക",redCardTitle:"🚩 സാധാരണ അപകടസൂചനകൾ",redCardText:"മുൻകൂർ ഫീസ്, ഉറപ്പായ അംഗീകാര വാഗ്ദാനങ്ങൾ, OTP/PIN ആവശ്യങ്ങൾ.",greenCardTitle:"🟢 സുരക്ഷിത വായ്പ",greenCardText:"വായ്പാദാതാവിനെ പരിശോധിക്കുകയും നിബന്ധനകൾ വായിക്കുകയും ചെയ്യുക.",verifyTitle:"🏦 വായ്പാദാതാവിനെ പരിശോധിക്കുക",verifyText:"ഔദ്യോഗിക ഉറവിടങ്ങളിൽ നിയമപരമായ പേരും അനുമതിയും പരിശോധിക്കുക.",rbiLink:"ഔദ്യോഗിക RBI വെബ്സൈറ്റ് ↗",sachetLink:"RBI Sachet പോർട്ടൽ ↗",verifyNote:"ഈ ആപ്പ് വായ്പാദാതാവിനെ നേരിട്ട് സ്ഥിരീകരിക്കുന്നില്ല.",emiTitle:"🧮 EMI, വായ്പാ ചെലവ് കാൽക്കുലേറ്റർ",emiText:"പ്രതിമാസ തിരിച്ചടവ് കണക്കാക്കുക.",principalLabel:"വായ്പ തുക (₹)",rateLabel:"വാർഷിക പലിശ (%)",monthsLabel:"കാലാവധി (മാസം)",processingLabel:"പ്രോസസ്സിംഗ് ഫീസ് (₹)",emiBtn:"EMI കണക്കാക്കുക",monthlyEMI:"പ്രതിമാസ EMI",totalInterest:"ആകെ പലിശ",totalRepay:"ആകെ തിരിച്ചടവ്",totalCost:"തിരിച്ചടവ് + ഫീസ്",emiNote:"ഇത് ഏകദേശ കണക്കാണ്; യഥാർത്ഥ തുക വ്യത്യാസപ്പെടാം.",stepsTitle:"🛡️ വായ്പ സ്വീകരിക്കുന്നതിന് മുമ്പ്",step1:"ഔദ്യോഗിക ഉറവിടങ്ങളിൽ പരിശോധിക്കുക.",step2:"കരാറും എല്ലാ ഫീസുകളും വായിക്കുക.",step3:"OTP, PIN, പാസ്‌വേഡ് പങ്കിടരുത്.",step4:"സംശയകരമായ മുൻകൂർ ഫീസ് നൽകരുത്.",step5:"തട്ടിപ്പ് സംശയമുണ്ടെങ്കിൽ ബാങ്കുമായി ബന്ധപ്പെടുക.",footerText:"LoanShield AI · ബോധവൽക്കരണത്തിന് മാത്രം; ഉറപ്പല്ല."
+},
+kn:{
+heroTitle:"ಸಾಲ ಪಡೆಯುವ ಮೊದಲು ನಿಮ್ಮನ್ನು ಸುರಕ್ಷಿತವಾಗಿರಿಸಿಕೊಳ್ಳಿ",heroText:"ಸಾಲದ ಆಫರ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಎಚ್ಚರಿಕೆಯ ಸೂಚನೆಗಳನ್ನು ಗುರುತಿಸಿ.",reviewTitle:"🔎 ಸಾಲದ ಆಫರ್ ಪರಿಶೀಲಿಸಿ",companyLabel:"ಬ್ಯಾಂಕ್ / ಸಾಲದಾತರ ಹೆಸರು",companyPH:"ಬ್ಯಾಂಕ್ ಅಥವಾ ಸಾಲದ ಆ್ಯಪ್ ಹೆಸರು ನಮೂದಿಸಿ",offerLabel:"ಸಾಲದ ಆಫರ್ ಅಥವಾ ಸಂದೇಶ",offerPH:"ಸಂದೇಶ ನಮೂದಿಸುವ ಮೊದಲು ವೈಯಕ್ತಿಕ ಮಾಹಿತಿಯನ್ನು ತೆಗೆದುಹಾಕಿ.",feeLabel:"ಶುಲ್ಕಗಳು ಸ್ಪಷ್ಟವಾಗಿವೆಯೇ?",unknown:"ಖಚಿತವಿಲ್ಲ",feeYes:"ಹೌದು, ಸ್ಪಷ್ಟವಾಗಿದೆ",feeNo:"ಇಲ್ಲ, ಅಸ್ಪಷ್ಟವಾಗಿದೆ",regLabel:"ಸಾಲದಾತರ ಪರಿಶೀಲನೆ",verified:"ಸ್ವತಂತ್ರವಾಗಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ",unverified:"ಪರಿಶೀಲಿಸಿಲ್ಲ / ಅನುಮಾನಾಸ್ಪದ",advanceLabel:"ಸಾಲಕ್ಕೂ ಮೊದಲು ಮುಂಗಡ ಹಣ ಕೇಳಲಾಗುತ್ತಿದೆಯೇ?",no:"ಇಲ್ಲ",yes:"ಹೌದು",reviewBtn:"ಸಾಲದ ಸುರಕ್ಷತೆ ಪರಿಶೀಲಿಸಿ",privacyNote:"ಮಾಹಿತಿ ಈ ಪುಟದಲ್ಲೇ ಬಳಕೆಯಾಗುತ್ತದೆ; ಸಂಗ್ರಹಿಸಲಾಗುವುದಿಲ್ಲ. ಗೌಪ್ಯ ವಿವರಗಳನ್ನು ನಮೂದಿಸಬೇಡಿ.",resultTitle:"ಪ್ರಾಥಮಿಕ ಪರಿಶೀಲನೆ",redTitle:"🚩 ಎಚ್ಚರಿಕೆಯ ಸೂಚನೆಗಳು",greenTitle:"✅ ಶಿಫಾರಸು ಮಾಡಿದ ಕ್ರಮಗಳು",scoreDisclaimer:"ಇದು ಪ್ರಾಥಮಿಕ ಪರಿಶೀಲನೆ ಮಾತ್ರ; ಖಚಿತ ವಂಚನೆ ಪತ್ತೆ ಸಾಧನವಲ್ಲ.",shareBtn:"WhatsApp ನಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಿ",printBtn:"ಮುದ್ರಿಸಿ / PDF ಉಳಿಸಿ",resetBtn:"ಫಾರ್ಮ್ ತೆರವುಗೊಳಿಸಿ",redCardTitle:"🚩 ಸಾಮಾನ್ಯ ಅಪಾಯಗಳು",redCardText:"ಮುಂಗಡ ಶುಲ್ಕ, ಖಚಿತ ಅನುಮೋದನೆಯ ಭರವಸೆ ಮತ್ತು OTP/PIN ಕೇಳುವುದು.",greenCardTitle:"🟢 ಸುರಕ್ಷಿತ ಸಾಲ",greenCardText:"ಸಾಲದಾತರನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಒಪ್ಪಂದ ಓದಿ.",verifyTitle:"🏦 ಸಾಲದಾತರನ್ನು ಪರಿಶೀಲಿಸಿ",verifyText:"ಅಧಿಕೃತ ಮೂಲಗಳಲ್ಲಿ ಕಾನೂನು ಹೆಸರು ಮತ್ತು ಅನುಮತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ.",rbiLink:"ಅಧಿಕೃತ RBI ವೆಬ್‌ಸೈಟ್ ↗",sachetLink:"RBI Sachet ಪೋರ್ಟಲ್ ↗",verifyNote:"ಈ ಆ್ಯಪ್ ಸಾಲದಾತರನ್ನು ನೇರವಾಗಿ ಪರಿಶೀಲಿಸುವುದಿಲ್ಲ.",emiTitle:"🧮 EMI ಮತ್ತು ಸಾಲ ವೆಚ್ಚ ಕ್ಯಾಲ್ಕುಲೇಟರ್",emiText:"ಮಾಸಿಕ ಮರುಪಾವತಿ ಅಂದಾಜಿಸಿ.",principalLabel:"ಸಾಲದ ಮೊತ್ತ (₹)",rateLabel:"ವಾರ್ಷಿಕ ಬಡ್ಡಿ (%)",monthsLabel:"ಅವಧಿ (ತಿಂಗಳು)",processingLabel:"ಪ್ರಕ್ರಿಯಾ ಶುಲ್ಕ (₹)",emiBtn:"EMI ಲೆಕ್ಕಿಸಿ",monthlyEMI:"ಮಾಸಿಕ EMI",totalInterest:"ಒಟ್ಟು ಬಡ್ಡಿ",totalRepay:"ಒಟ್ಟು ಮರುಪಾವತಿ",totalCost:"ಮರುಪಾವತಿ + ಶುಲ್ಕ",emiNote:"ಇದು ಅಂದಾಜು ಮಾತ್ರ; ನಿಜವಾದ ಮೊತ್ತ ಬದಲಾಗಬಹುದು.",stepsTitle:"🛡️ ಸಾಲ ಸ್ವೀಕರಿಸುವ ಮೊದಲು",step1:"ಅಧಿಕೃತ ಮೂಲಗಳಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.",step2:"ಒಪ್ಪಂದ ಮತ್ತು ಎಲ್ಲಾ ಶುಲ್ಕ ಓದಿ.",step3:"OTP, PIN ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಹಂಚಿಕೊಳ್ಳಬೇಡಿ.",step4:"ಅನುಮಾನಾಸ್ಪದ ಮುಂಗಡ ಶುಲ್ಕ ಪಾವತಿಸಬೇಡಿ.",step5:"ವಂಚನೆ ಅನುಮಾನವಿದ್ದರೆ ಬ್ಯಾಂಕ್ ಸಂಪರ್ಕಿಸಿ.",footerText:"LoanShield AI · ಜಾಗೃತಿ ಸಾಧನ ಮಾತ್ರ; ಖಾತರಿಯಲ್ಲ."
+},
+gu:{
+heroTitle:"લોન લેતા પહેલાં પોતાને સુરક્ષિત રાખો",heroText:"લોનની ઑફર તપાસો અને ચેતવણીનાં સંકેતો ઓળખો.",reviewTitle:"🔎 લોનની ઑફર તપાસો",companyLabel:"બૅન્ક / ધિરાણકર્તાનું નામ",companyPH:"બૅન્ક અથવા લોન ઍપનું નામ લખો",offerLabel:"લોનની ઑફર અથવા સંદેશ",offerPH:"સંદેશ લખો; પહેલાં વ્યક્તિગત માહિતી દૂર કરો.",feeLabel:"શું ફી સ્પષ્ટ છે?",unknown:"ખાતરી નથી",feeYes:"હા, સ્પષ્ટ છે",feeNo:"ના, અસ્પષ્ટ છે",regLabel:"ધિરાણકર્તાની ચકાસણી",verified:"સ્વતંત્ર રીતે ચકાસ્યું",unverified:"ચકાસ્યું નથી / શંકાસ્પદ",advanceLabel:"શું લોન પહેલાં આગોતરી ચુકવણી માંગે છે?",no:"ના",yes:"હા",reviewBtn:"લોનની સુરક્ષા તપાસો",privacyNote:"માહિતી આ પેજ પર જ વપરાય છે અને સાચવાતી નથી. ગુપ્ત માહિતી દાખલ કરશો નહીં.",resultTitle:"પ્રાથમિક સમીક્ષા",redTitle:"🚩 ચેતવણીનાં સંકેતો",greenTitle:"✅ સૂચવેલ પગલાં",scoreDisclaimer:"આ પ્રાથમિક તપાસ છે, પ્રમાણિત છેતરપિંડી શોધનાર નથી.",shareBtn:"WhatsApp પર શેર કરો",printBtn:"પ્રિન્ટ / PDF સાચવો",resetBtn:"ફોર્મ સાફ કરો",redCardTitle:"🚩 સામાન્ય જોખમ",redCardText:"આગોતરી ફી, ખાતરીપૂર્વક મંજૂરીના દાવા અને OTP/PIN માગવું.",greenCardTitle:"🟢 સુરક્ષિત ઉધાર",greenCardText:"ધિરાણકર્તાની સ્વતંત્ર ચકાસણી કરો અને કરાર વાંચો.",verifyTitle:"🏦 ધિરાણકર્તાની ચકાસણી",verifyText:"સત્તાવાર સ્ત્રોતોમાં કાનૂની નામ અને મંજૂરી તપાસો.",rbiLink:"સત્તાવાર RBI વેબસાઇટ ↗",sachetLink:"RBI Sachet પોર્ટલ ↗",verifyNote:"આ ઍપ ધિરાણકર્તાની સીધી ચકાસણી કરતી નથી.",emiTitle:"🧮 EMI અને લોન ખર્ચ કેલ્ક્યુલેટર",emiText:"માસિક ચુકવણીનો અંદાજ કાઢો.",principalLabel:"લોનની રકમ (₹)",rateLabel:"વાર્ષિક વ્યાજ (%)",monthsLabel:"સમયગાળો (મહિના)",processingLabel:"પ્રોસેસિંગ ફી (₹)",emiBtn:"EMI ગણો",monthlyEMI:"માસિક EMI",totalInterest:"કુલ વ્યાજ",totalRepay:"કુલ ચુકવણી",totalCost:"ચુકવણી + ફી",emiNote:"આ અંદાજ છે; વાસ્તવિક રકમ અલગ હોઈ શકે છે.",stepsTitle:"🛡️ લોન સ્વીકારતાં પહેલાં",step1:"સત્તાવાર સ્ત્રોતોથી તપાસો.",step2:"કરાર અને બધી ફી વાંચો.",step3:"OTP, PIN અથવા પાસવર્ડ શેર ન કરો.",step4:"શંકાસ્પદ આગોતરી ફી ન ચૂકવો.",step5:"છેતરપિંડીની શંકા હોય તો બૅન્કનો સંપર્ક કરો.",footerText:"LoanShield AI · જાગૃતિ માટેનું સાધન; ખાતરી નથી."
+},
+bn:{
+heroTitle:"ঋণ নেওয়ার আগে নিজেকে সুরক্ষিত রাখুন",heroText:"ঋণের প্রস্তাব যাচাই করুন এবং সতর্কতার লক্ষণ চিনুন।",reviewTitle:"🔎 ঋণের প্রস্তাব যাচাই করুন",companyLabel:"ব্যাঙ্ক / ঋণদাতার নাম",companyPH:"ব্যাঙ্ক বা ঋণ অ্যাপের নাম লিখুন",offerLabel:"ঋণের প্রস্তাব বা বার্তা",offerPH:"বার্তা দিন; আগে ব্যক্তিগত তথ্য সরিয়ে ফেলুন।",feeLabel:"ফি কি স্পষ্ট?",unknown:"নিশ্চিত নই",feeYes:"হ্যাঁ, স্পষ্ট",feeNo:"না, অস্পষ্ট",regLabel:"ঋণদাতার যাচাই",verified:"স্বাধীনভাবে যাচাই করা",unverified:"যাচাই হয়নি / সন্দেহজনক",advanceLabel:"ঋণ দেওয়ার আগে কি অগ্রিম টাকা চাওয়া হচ্ছে?",no:"না",yes:"হ্যাঁ",reviewBtn:"ঋণের নিরাপত্তা যাচাই করুন",privacyNote:"তথ্য এই পেজেই ব্যবহার হয় এবং সংরক্ষণ করা হয় না। গোপন তথ্য দেবেন না।",resultTitle:"প্রাথমিক পর্যালোচনা",redTitle:"🚩 সতর্কতার লক্ষণ",greenTitle:"✅ প্রস্তাবিত পদক্ষেপ",scoreDisclaimer:"এটি প্রাথমিক যাচাই, নিশ্চিত জালিয়াতি শনাক্তকারী নয়।",shareBtn:"WhatsApp-এ শেয়ার করুন",printBtn:"প্রিন্ট / PDF সংরক্ষণ",resetBtn:"ফর্ম পরিষ্কার করুন",redCardTitle:"🚩 সাধারণ ঝুঁকি",redCardText:"অগ্রিম ফি, নিশ্চিত অনুমোদনের দাবি এবং OTP/PIN চাওয়া।",greenCardTitle:"🟢 নিরাপদ ঋণ",greenCardText:"ঋণদাতাকে যাচাই করুন এবং চুক্তি পড়ুন।",verifyTitle:"🏦 ঋণদাতা যাচাই করুন",verifyText:"সরকারি সূত্রে আইনি নাম ও অনুমোদন যাচাই করুন।",rbiLink:"সরকারি RBI ওয়েবসাইট ↗",sachetLink:"RBI Sachet পোর্টাল ↗",verifyNote:"এই অ্যাপ সরাসরি ঋণদাতাকে যাচাই করে না।",emiTitle:"🧮 EMI ও ঋণ খরচ ক্যালকুলেটর",emiText:"মাসিক কিস্তির আনুমানিক হিসাব করুন।",principalLabel:"ঋণের পরিমাণ (₹)",rateLabel:"বার্ষিক সুদ (%)",monthsLabel:"মেয়াদ (মাস)",processingLabel:"প্রসেসিং ফি (₹)",emiBtn:"EMI হিসাব করুন",monthlyEMI:"মাসিক EMI",totalInterest:"মোট সুদ",totalRepay:"মোট পরিশোধ",totalCost:"পরিশোধ + ফি",emiNote:"এটি আনুমানিক হিসাব; প্রকৃত পরিমাণ আলাদা হতে পারে।",stepsTitle:"🛡️ ঋণ নেওয়ার আগে",step1:"সরকারি সূত্রে যাচাই করুন।",step2:"চুক্তি ও সব ফি পড়ুন।",step3:"OTP, PIN বা পাসওয়ার্ড শেয়ার করবেন না।",step4:"সন্দেহজনক অগ্রিম ফি দেবেন না।",step5:"জালিয়াতির সন্দেহ হলে ব্যাঙ্কের সঙ্গে যোগাযোগ করুন।",footerText:"LoanShield AI · সচেতনতার জন্য; নিশ্চয়তা নয়।"
+},
+ta:{
+heroTitle:"கடன் பெறுவதற்கு முன் உங்களைப் பாதுகாத்துக் கொள்ளுங்கள்",heroText:"கடன் சலுகைகளைச் சரிபார்த்து எச்சரிக்கை அறிகுறிகளை அறியுங்கள்.",reviewTitle:"🔎 கடன் சலுகையைச் சரிபார்க்கவும்",companyLabel:"வங்கி / கடன் வழங்குநர் பெயர்",companyPH:"வங்கி அல்லது கடன் செயலியின் பெயரை உள்ளிடவும்",offerLabel:"கடன் சலுகை அல்லது செய்தி",offerPH:"செய்தியை உள்ளிடவும்; முதலில் தனிப்பட்ட விவரங்களை நீக்கவும்.",feeLabel:"கட்டணங்கள் தெளிவாக உள்ளனவா?",unknown:"தெரியவில்லை",feeYes:"ஆம், தெளிவாக உள்ளது",feeNo:"இல்லை, தெளிவற்றது",regLabel:"கடன் வழங்குநர் சரிபார்ப்பு",verified:"சுயமாகச் சரிபார்க்கப்பட்டது",unverified:"சரிபார்க்கப்படவில்லை / சந்தேகம்",advanceLabel:"கடனுக்கு முன் முன்பணம் கேட்கப்படுகிறதா?",no:"இல்லை",yes:"ஆம்",reviewBtn:"கடன் பாதுகாப்பைச் சரிபார்க்கவும்",privacyNote:"தகவல்கள் இந்தப் பக்கத்தில் மட்டுமே பயன்படுத்தப்படும்; சேமிக்கப்படாது. ரகசிய விவரங்களை உள்ளிட வேண்டாம்.",resultTitle:"ஆரம்பநிலை மதிப்பாய்வு",redTitle:"🚩 எச்சரிக்கை அறிகுறிகள்",greenTitle:"✅ பரிந்துரைக்கப்படும் நடவடிக்கைகள்",scoreDisclaimer:"இது ஆரம்பநிலைச் சரிபார்ப்பு மட்டுமே; உறுதிப்படுத்தப்பட்ட மோசடி கண்டறிதல் அல்ல.",shareBtn:"WhatsApp-ல் பகிரவும்",printBtn:"அச்சிடு / PDF சேமி",resetBtn:"படிவத்தை அழிக்கவும்",redCardTitle:"🚩 பொதுவான ஆபத்துகள்",redCardText:"முன்பணம், உறுதியான ஒப்புதல் வாக்குறுதிகள் மற்றும் OTP/PIN கேட்பது.",greenCardTitle:"🟢 பாதுகாப்பான கடன்",greenCardText:"கடன் வழங்குநரைச் சரிபார்த்து ஒப்பந்தத்தைப் படிக்கவும்.",verifyTitle:"🏦 கடன் வழங்குநரைச் சரிபார்க்கவும்",verifyText:"அதிகாரப்பூர்வ ஆதாரங்களில் சட்டப்பூர்வ பெயர் மற்றும் அனுமதியைச் சரிபார்க்கவும்.",rbiLink:"அதிகாரப்பூர்வ RBI இணையதளம் ↗",sachetLink:"RBI Sachet தளம் ↗",verifyNote:"இந்தச் செயலி கடன் வழங்குநரை நேரடியாகச் சரிபார்ப்பதில்லை.",emiTitle:"🧮 EMI மற்றும் கடன் செலவு கணிப்பான்",emiText:"மாதாந்திரத் தவணையை மதிப்பிடுங்கள்.",principalLabel:"கடன் தொகை (₹)",rateLabel:"ஆண்டு வட்டி (%)",monthsLabel:"காலம் (மாதங்கள்)",processingLabel:"செயலாக்கக் கட்டணம் (₹)",emiBtn:"EMI கணக்கிடவும்",monthlyEMI:"மாத EMI",totalInterest:"மொத்த வட்டி",totalRepay:"மொத்தத் திருப்பிச் செலுத்தல்",totalCost:"திருப்பிச் செலுத்தல் + கட்டணம்",emiNote:"இது மதிப்பீடு மட்டுமே; உண்மையான தொகை மாறலாம்.",stepsTitle:"🛡️ கடனை ஏற்கும் முன்",step1:"அதிகாரப்பூர்வ ஆதாரங்களில் சரிபார்க்கவும்.",step2:"ஒப்பந்தம் மற்றும் அனைத்து கட்டணங்களையும் படிக்கவும்.",step3:"OTP, PIN அல்லது கடவுச்சொல்லைப் பகிர வேண்டாம்.",step4:"சந்தேகத்திற்குரிய முன்பணம் செலுத்த வேண்டாம்.",step5:"மோசடி சந்தேகம் இருந்தால் வங்கியைத் தொடர்புகொள்ளவும்.",footerText:"LoanShield AI · விழிப்புணர்வுக்காக மட்டுமே; உத்தரவாதமல்ல."
+},
+te:{
+heroTitle:"రుణం తీసుకునే ముందు మిమ్మల్ని మీరు రక్షించుకోండి",heroText:"రుణ ఆఫర్లను పరిశీలించి హెచ్చరిక సంకేతాలను గుర్తించండి.",reviewTitle:"🔎 రుణ ఆఫర్‌ను పరిశీలించండి",companyLabel:"బ్యాంక్ / రుణదాత పేరు",companyPH:"బ్యాంక్ లేదా రుణ యాప్ పేరు నమోదు చేయండి",offerLabel:"రుణ ఆఫర్ లేదా సందేశం",offerPH:"సందేశాన్ని నమోదు చేయండి; ముందుగా వ్యక్తిగత వివరాలు తొలగించండి.",feeLabel:"ఫీజులు స్పష్టంగా ఉన్నాయా?",unknown:"తెలియదు",feeYes:"అవును, స్పష్టంగా ఉన్నాయి",feeNo:"కాదు, అస్పష్టంగా ఉన్నాయి",regLabel:"రుణదాత ధృవీకరణ",verified:"స్వతంత్రంగా ధృవీకరించారు",unverified:"ధృవీకరించలేదు / అనుమానాస్పదం",advanceLabel:"రుణానికి ముందు ముందస్తు చెల్లింపు అడుగుతున్నారా?",no:"కాదు",yes:"అవును",reviewBtn:"రుణ భద్రతను తనిఖీ చేయండి",privacyNote:"వివరాలు ఈ పేజీలో మాత్రమే ఉపయోగించబడతాయి; నిల్వ చేయబడవు. రహస్య వివరాలు ఇవ్వవద్దు.",resultTitle:"ప్రాథమిక సమీక్ష",redTitle:"🚩 హెచ్చరిక సంకేతాలు",greenTitle:"✅ సూచించిన చర్యలు",scoreDisclaimer:"ఇది ప్రాథమిక తనిఖీ మాత్రమే; నిర్ధారిత మోసం గుర్తింపు సాధనం కాదు.",shareBtn:"WhatsAppలో పంచుకోండి",printBtn:"ప్రింట్ / PDF సేవ్",resetBtn:"ఫారమ్ క్లియర్ చేయండి",redCardTitle:"🚩 సాధారణ ప్రమాదాలు",redCardText:"ముందస్తు ఫీజులు, ఖచ్చితమైన ఆమోద హామీలు, OTP/PIN అడగడం.",greenCardTitle:"🟢 సురక్షిత రుణం",greenCardText:"రుణదాతను ధృవీకరించి ఒప్పందాన్ని చదవండి.",verifyTitle:"🏦 రుణదాతను ధృవీకరించండి",verifyText:"అధికారిక వనరుల్లో చట్టపరమైన పేరు, అనుమతిని తనిఖీ చేయండి.",rbiLink:"అధికారిక RBI వెబ్‌సైట్ ↗",sachetLink:"RBI Sachet పోర్టల్ ↗",verifyNote:"ఈ యాప్ రుణదాతను నేరుగా ధృవీకరించదు.",emiTitle:"🧮 EMI మరియు రుణ ఖర్చు కాలిక్యులేటర్",emiText:"నెలవారీ చెల్లింపును అంచనా వేయండి.",principalLabel:"రుణ మొత్తం (₹)",rateLabel:"వార్షిక వడ్డీ (%)",monthsLabel:"కాలవ్యవధి (నెలలు)",processingLabel:"ప్రాసెసింగ్ ఫీజు (₹)",emiBtn:"EMI లెక్కించండి",monthlyEMI:"నెలవారీ EMI",totalInterest:"మొత్తం వడ్డీ",totalRepay:"మొత్తం తిరిగి చెల్లింపు",totalCost:"చెల్లింపు + ఫీజు",emiNote:"ఇది అంచనా మాత్రమే; అసలు మొత్తం మారవచ్చు.",stepsTitle:"🛡️ రుణం అంగీకరించే ముందు",step1:"అధికారిక వనరుల ద్వారా తనిఖీ చేయండి.",step2:"ఒప్పందం, అన్ని ఫీజులు చదవండి.",step3:"OTP, PIN లేదా పాస్‌వర్డ్ పంచుకోవద్దు.",step4:"అనుమానాస్పద ముందస్తు ఫీజులు చెల్లించవద్దు.",step5:"మోసం అనుమానం ఉంటే బ్యాంకును సంప్రదించండి.",footerText:"LoanShield AI · అవగాహన కోసం మాత్రమే; హామీ కాదు."
+},
+mr:{
+heroTitle:"कर्ज घेण्यापूर्वी स्वतःचे संरक्षण करा",heroText:"कर्जाच्या ऑफर तपासा आणि धोक्याची चिन्हे ओळखा.",reviewTitle:"🔎 कर्जाच्या ऑफरची तपासणी",companyLabel:"बँक / कर्जदात्याचे नाव",companyPH:"बँक किंवा कर्ज अॅपचे नाव लिहा",offerLabel:"कर्जाची ऑफर किंवा संदेश",offerPH:"संदेश टाका; आधी वैयक्तिक माहिती काढून टाका.",feeLabel:"शुल्क स्पष्ट आहे का?",unknown:"खात्री नाही",feeYes:"होय, स्पष्ट आहे",feeNo:"नाही, अस्पष्ट आहे",regLabel:"कर्जदात्याची पडताळणी",verified:"स्वतंत्रपणे पडताळले",unverified:"पडताळणी नाही / संशयास्पद",advanceLabel:"कर्जापूर्वी आगाऊ पैसे मागितले जात आहेत का?",no:"नाही",yes:"होय",reviewBtn:"कर्जाची सुरक्षितता तपासा",privacyNote:"माहिती या पेजवरच वापरली जाते; जतन केली जात नाही. गोपनीय माहिती टाकू नका.",resultTitle:"प्राथमिक तपासणी",redTitle:"🚩 धोक्याची चिन्हे",greenTitle:"✅ शिफारस केलेली पावले",scoreDisclaimer:"ही प्राथमिक तपासणी आहे; खात्रीशीर फसवणूक शोधणारे साधन नाही.",shareBtn:"WhatsApp वर शेअर करा",printBtn:"प्रिंट / PDF जतन करा",resetBtn:"फॉर्म साफ करा",redCardTitle:"🚩 सामान्य धोके",redCardText:"आगाऊ शुल्क, हमखास मंजुरीचे दावे आणि OTP/PIN मागणे.",greenCardTitle:"🟢 सुरक्षित कर्ज",greenCardText:"कर्जदात्याची स्वतंत्र पडताळणी करा आणि करार वाचा.",verifyTitle:"🏦 कर्जदात्याची पडताळणी",verifyText:"अधिकृत स्रोतांवर कायदेशीर नाव आणि परवानगी तपासा.",rbiLink:"अधिकृत RBI वेबसाइट ↗",sachetLink:"RBI Sachet पोर्टल ↗",verifyNote:"हे अॅप कर्जदात्याची थेट पडताळणी करत नाही.",emiTitle:"🧮 EMI आणि कर्ज खर्च कॅल्क्युलेटर",emiText:"मासिक हप्त्याचा अंदाज काढा.",principalLabel:"कर्जाची रक्कम (₹)",rateLabel:"वार्षिक व्याज (%)",monthsLabel:"कालावधी (महिने)",processingLabel:"प्रक्रिया शुल्क (₹)",emiBtn:"EMI मोजा",monthlyEMI:"मासिक EMI",totalInterest:"एकूण व्याज",totalRepay:"एकूण परतफेड",totalCost:"परतफेड + शुल्क",emiNote:"हा अंदाज आहे; प्रत्यक्ष रक्कम वेगळी असू शकते.",stepsTitle:"🛡️ कर्ज स्वीकारण्यापूर्वी",step1:"अधिकृत स्रोतांवर पडताळणी करा.",step2:"करार आणि सर्व शुल्क वाचा.",step3:"OTP, PIN किंवा पासवर्ड शेअर करू नका.",step4:"संशयास्पद आगाऊ शुल्क भरू नका.",step5:"फसवणुकीचा संशय असल्यास बँकेशी संपर्क साधा.",footerText:"LoanShield AI · जनजागृतीसाठी; हमी नाही."
+}
 };
 
-function tr(key){
- const i=keys.indexOf(key);
- const a=translations[currentLang]||en;
- if(i<0)return key;
- if(key==="steps")return (a[29]||en[29]).split("|");
- if(i>=31)return ((a[31]||en[31]).split("|")[i-31]||"");
- return a[i]||en[i];
-}
-
-let currentLang="en",lastReport=null;
-
-function setLanguage(lang){
- currentLang=translations[lang]?lang:"en";
- try{localStorage.setItem(LANG_KEY,currentLang)}catch(e){}
- document.documentElement.lang=currentLang;
- document.documentElement.dir=currentLang==="ur"?"rtl":"ltr";
- $("languageSelect").value=currentLang;
-
- const ids=keys.slice(0,31).filter(k=>k!=="steps");
- ids.forEach(k=>{if($(k))$(k).textContent=tr(k)});
-
- $("company").placeholder=tr("companyPlaceholder");
- $("offer").placeholder=tr("offerPlaceholder");
-
- document.querySelectorAll("[data-t]").forEach(o=>o.textContent=tr(o.dataset.t));
- $("stepsList").innerHTML=tr("steps").map(s=>"<li>"+escapeHTML(s)+"</li>").join("");
-
+const en=messages.en;
+let lang="en",lastReport=null;
+function t(k){return (messages[lang]&&messages[lang][k])||en[k]||k}
+function setLanguage(value){
+ lang=messages[value]?value:"en";
+ try{localStorage.setItem(LANG_KEY,lang)}catch(e){}
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==="ur"?"rtl":"ltr";
+ $("languageSelect").value=lang;
+ document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i)});
+ document.querySelectorAll("[data-ph]").forEach(el=>{el.placeholder=t(el.dataset.ph)});
+ $("themeBtn").title=lang==="hi"?"डार्क मोड बदलें":lang==="ur"?"ڈارک موڈ تبدیل کریں":"Toggle dark mode";
  if(lastReport)renderReport();
 }
-
-function escapeHTML(s){
- return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-
-function toggleTheme(){
- document.body.classList.toggle("dark");
- const dark=document.body.classList.contains("dark");
+function setTheme(dark){
+ document.body.classList.toggle("dark",dark);
  $("themeBtn").textContent=dark?"☀️":"🌙";
+ $("themeBtn").setAttribute("aria-label",dark?"Light mode":"Dark mode");
  try{localStorage.setItem(THEME_KEY,dark?"dark":"light")}catch(e){}
 }
-
-function reviewOffer(){
- const company=$("company").value.trim();
- const offer=$("offer").value.trim();
- const fees=$("fees").value;
- const lender=$("lender").value;
- const advance=$("advance").value;
-
- let risk=0,red=[],green=[];
-
- if(lender==="unverified"){risk+=35;red.push(tr("lenderBad"))}
- else if(lender==="unknown"){risk+=15;red.push(tr("lenderCheck"))}
- else green.push(tr("lenderGood"));
-
- if(fees==="no"){risk+=25;red.push(tr("feesBad"))}
- else if(fees==="unknown"){risk+=10;red.push(tr("feesCheck"))}
- else green.push(tr("feesGood"));
-
- if(advance==="yes"){risk+=35;red.push(tr("advanceBad"))}
- else if(advance==="unknown"){risk+=10;red.push(tr("advanceCheck"))}
- else green.push(tr("advanceGood"));
-
- if(/otp|pin|password|urgent|guaranteed|processing fee|pay first|advance fee|unlock loan|send money/i.test(offer)){
-  risk+=20;red.push(tr("suspicious"));
- }
-
- if(!company&&!offer)red.push(tr("enterDetails"));
-
- const score=100-Math.min(100,risk);
- $("result").style.display="block";
- $("score").textContent=score+"/100";
- $("scoreLabel").textContent=tr("scoreLabel");
- $("redList").innerHTML=(red.length?red:[tr("noRisks")]).map(s=>"<li>"+escapeHTML(s)+"</li>").join("");
- $("greenList").innerHTML=(green.length?green:[tr("verifyTerms")]).map(s=>"<li>"+escapeHTML(s)+"</li>").join("");
-
- lastReport={company,score,red};
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function addItem(list,text){const li=document.createElement("li");li.textContent=text;list.appendChild(li)}
+function review(){
+ const company=$("company").value.trim(),offer=$("offer").value.trim();
+ if(!company&&!offer){alert(t("enter"));$("company").focus();return}
+ let risk=0,red=[],actions=[t("actionVerify"),t("actionNoOTP"),t("actionTerms")];
+ const fees=$("fees").value,lender=$("lender").value,advance=$("advance").value;
+ if(lender==="unverified"){risk+=35;red.push(t("lenderUnverified"))}
+ else if(lender==="unknown"){risk+=15;red.push(t("lenderUnknown"))}
+ else red.push(t("lenderVerified"));
+ if(fees==="no"){risk+=25;red.push(t("feesBad"))}
+ else if(fees==="unknown"){risk+=10;red.push(t("feesUnknown"))}
+ else red.push(t("feesGood"));
+ if(advance==="yes"){risk+=35;red.push(t("advanceBad"));actions.unshift(t("actionFee"))}
+ else if(advance==="unknown"){risk+=10;red.push(t("advanceUnknown"))}
+ else red.push(t("advanceGood"));
+ const text=offer.toLowerCase();
+ const patterns=[
+  {re:/\b(otp|one.time.password|pin|upi pin|bank password)\b/i,points:25},
+  {re:/guaranteed approval|100% approval|no verification|instant guaranteed/i,points:15},
+  {re:/pay first|pay upfront|advance fee|release fee|unlock loan|processing fee before loan|security deposit/i,points:20},
+  {re:/urgent|immediately|today only|act now|limited time/i,points:10},
+  {re:/remote access|screen sharing|install anydesk|install teamviewer/i,points:25}
+ ];
+ let matched=false;
+ patterns.forEach(p=>{if(p.re.test(offer)){risk+=p.points;matched=true}});
+ if(matched)red.push(t("keyword"));
+ if(!offer)red.push(t("enter"));
+ risk=Math.min(100,risk);
+ const score=100-risk;
+ const level=risk>=60?t("high"):risk>=30?t("medium"):t("low");
+ lastReport={company,score,risk,level,red,actions,offer};
  renderReport();
+ $("result").classList.remove("hidden");
  $("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
-
 function renderReport(){
  if(!lastReport)return;
- $("scoreLabel").textContent=tr("scoreLabel");
- let report=[tr("reportTitle")];
- if(lastReport.company)report.push(tr("lenderPrefix")+lastReport.company);
- report.push(tr("scorePrefix")+lastReport.score+"/100");
- report.push(...lastReport.red);
- report.push(tr("noGuarantee"));
- lastReport.text=report.join("\n");
+ $("riskBadge").textContent=lastReport.level;
+ $("score").textContent=lastReport.score+"/100";
+ $("scoreText").textContent=t("scoreLabel");
+ $("redList").replaceChildren();
+ $("greenList").replaceChildren();
+ if(lastReport.risk===0)addItem($("redList"),t("noRisk"));
+ lastReport.red.forEach(s=>addItem($("redList"),s));
+ [...new Set(lastReport.actions)].forEach(s=>addItem($("greenList"),s));
 }
-
-function shareReport(){
- const msg=lastReport?lastReport.text:tr("report");
- const url="https://wa.me/?text="+encodeURIComponent(msg);
- if(window.LoanShieldApp&&typeof window.LoanShieldApp.shareOnWhatsApp==="function"){
-  window.LoanShieldApp.shareOnWhatsApp(msg);
- }else{
-  window.open(url,"_blank");
+function calcEMI(){
+ const p=Number($("principal").value),annual=Number($("rate").value),n=Number($("months").value),fee=Number($("processing").value);
+ if(!Number.isFinite(p)||!Number.isFinite(annual)||!Number.isFinite(n)||!Number.isFinite(fee)||p<=0||annual<0||annual>100||n<1||n>600||!Number.isInteger(n)||fee<0||p>1e11||fee>1e8){
+  alert(t("invalid"));return;
  }
+ const r=annual/1200;
+ const emi=r===0?p/n:p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+ const interest=emi*n-p,total=emi*n;
+ const fmt=v=>new Intl.NumberFormat(lang==="en"?"en-IN":lang,{style:"currency",currency:"INR",maximumFractionDigits:2}).format(v);
+ $("emiValue").textContent=fmt(emi);
+ $("interestValue").textContent=fmt(interest);
+ $("repayValue").textContent=fmt(total);
+ $("costValue").textContent=fmt(total+fee);
+ $("emiResult").classList.remove("hidden");
 }
-
+function reportText(){
+ if(!lastReport)return t("whatsTitle");
+ return [t("whatsTitle"),t("companyLabel")+": "+(lastReport.company||"—"),t("scoreLabel")+": "+lastReport.score+"/100",...lastReport.red,t("reportDisclaimer"),t("footerText")].join("\n");
+}
+function share(){
+ const msg=reportText();
+ window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank","noopener,noreferrer");
+}
+function clearForm(){
+ ["company","offer"].forEach(id=>$(id).value="");
+ $("fees").value="unknown";$("lender").value="unknown";$("advance").value="unknown";
+ $("result").classList.add("hidden");lastReport=null;$("company").focus();
+}
 $("languageSelect").addEventListener("change",e=>setLanguage(e.target.value));
-$("themeBtn").addEventListener("click",toggleTheme);
-$("reviewBtn").addEventListener("click",reviewOffer);
-$("shareBtn").addEventListener("click",shareReport);
-
+$("themeBtn").addEventListener("click",()=>setTheme(!document.body.classList.contains("dark")));
+$("reviewBtn").addEventListener("click",review);
+$("emiBtn").addEventListener("click",calcEMI);
+$("shareBtn").addEventListener("click",share);
+$("printBtn").addEventListener("click",()=>window.print());
+$("resetBtn").addEventListener("click",clearForm);
 try{
- if(localStorage.getItem(THEME_KEY)==="dark"){
-  document.body.classList.add("dark");
-  $("themeBtn").textContent="☀️";
- }
  const saved=localStorage.getItem(LANG_KEY);
- if(saved&&translations[saved])currentLang=saved;
-}catch(e){}
-
-setLanguage(currentLang);
+ if(saved&&messages[saved])lang=saved;
+ setTheme(localStorage.getItem(THEME_KEY)==="dark");
+}catch(e){setTheme(false)}
+setLanguage(lang);
 </script>
 </body>
 </html>
