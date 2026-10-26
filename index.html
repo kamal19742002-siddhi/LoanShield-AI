@@ -390,6 +390,446 @@ window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank","noopener,no
 }
 document.getElementById("year").textContent=new Date().getFullYear();
 setLanguage("en");
+  
+/* LoanShield AI — PLUS / MINUS Customer Report */
+(function () {
+  "use strict";
+
+  const oldCheckOffer = window.checkOffer;
+  const oldRenderPDFAnalysis = window.renderPDFAnalysis;
+  const oldCalculateLoan = window.calculateLoan;
+
+  let reportText = "";
+  let currentSourceText = "";
+  let currentReport = null;
+
+  const $ = id => document.getElementById(id);
+  const val = id => $(id) ? $(id).value : "";
+  const txt = id => $(id) ? $(id).textContent.trim() : "";
+  const language = () => val("language") === "hi";
+
+  const disclaimer = () => language()
+    ? "यह रिपोर्ट केवल प्रारंभिक जानकारी और शिक्षा के लिए है। यह वित्तीय या कानूनी सलाह नहीं है। स्वचालित जाँच अधूरी या गलत हो सकती है और किसी लोन या ऋणदाता की सुरक्षा की गारंटी नहीं देती। निर्णय से पहले योग्य वित्तीय या कानूनी सलाहकार से परामर्श करें।"
+    : "This report is for preliminary informational and educational purposes only. It is not financial or legal advice. Automated checks may be incomplete or inaccurate and cannot guarantee that a lender or loan is safe. Consult a qualified financial or legal advisor before deciding.";
+
+  function money(n) {
+    return Number.isFinite(n)
+      ? n.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+          maximumFractionDigits: 2
+        })
+      : (language() ? "नहीं मिला" : "Not detected");
+  }
+
+  function findNumber(text, regex) {
+    const m = text.match(regex);
+    if (!m) return null;
+    const n = Number(m[1].replace(/,/g, ""));
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function getFigures(text) {
+    const amount = findNumber(text,
+      /(?:loan amount|principal amount|amount financed|loan principal|sanctioned amount|लोन राशि|ऋण राशि)[^\d₹]{0,35}(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d+)?)/i);
+
+    const rate = findNumber(text,
+      /(?:annual interest(?: rate)?|interest rate|rate of interest|ब्याज दर)[^\d%]{0,25}([\d.]+)\s*%/i);
+
+    let emi = findNumber(text,
+      /(?:monthly emi|emi amount|monthly instalment|monthly installment|equated monthly instalment|equated monthly installment|मासिक ईएमआई)[^\d₹]{0,30}(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d+)?)/i);
+
+    let months = findNumber(text,
+      /(?:tenure|loan term|repayment period|loan period|अवधि)[^\d]{0,25}([\d.]+)\s*(?:months?|mos?)/i);
+
+    const years = findNumber(text,
+      /(?:tenure|loan term|repayment period|loan period|अवधि)[^\d]{0,25}([\d.]+)\s*(?:years?|yrs?)/i);
+
+    if (!months && years) months = years * 12;
+
+    if (!emi && amount > 0 && rate !== null && months > 0) {
+      const r = rate / 1200;
+      emi = r === 0
+        ? amount / months
+        : amount * r * Math.pow(1 + r, months) /
+          (Math.pow(1 + r, months) - 1);
+    }
+
+    const total = emi !== null && months
+      ? emi * months
+      : null;
+
+    return {
+      amount, rate, emi, months, total,
+      interest: total !== null && amount !== null
+        ? total - amount
+        : null
+    };
+  }
+
+  function inspectText(text) {
+    const t = (text || "").toLowerCase();
+    const plus = [];
+    const minus = [];
+    const verify = [];
+
+    const checks = [
+      {
+        re: /interest rate|rate of interest|annual interest|annual percentage rate|\broi\b|ब्याज दर/i,
+        plus: "Interest-rate information appears. Confirm the exact rate and whether it is fixed or floating.",
+        hiPlus: "ब्याज दर की जानकारी दिखाई देती है। वास्तविक दर और स्थिर या बदलती दर होने की पुष्टि करें。",
+        verify: "Confirm the interest rate, calculation method and whether the rate can change.",
+        hiVerify: "ब्याज दर, गणना के तरीके और दर बदलने की शर्त की पुष्टि करें।"
+      },
+      {
+        re: /\bemi\b|equated monthly instalment|equated monthly installment|repayment schedule|installment amount|instalment amount|मासिक ईएमआई/i,
+        plus: "EMI or repayment information appears. Compare it with the lender's official schedule.",
+        hiPlus: "EMI या भुगतान की जानकारी दिखाई देती है। इसे ऋणदाता की आधिकारिक तालिका से मिलाएँ।",
+        verify: "Verify the EMI amount, due dates and repayment schedule.",
+        hiVerify: "EMI राशि, भुगतान की तारीखों और भुगतान तालिका की पुष्टि करें।"
+      },
+      {
+        re: /processing fee|processing charges|administrative fee|documentation fee|service charge|hidden fee|additional charges|प्रोसेसिंग शुल्क/i,
+        minus: "Fees or charges are mentioned. Check their amount, taxes and conditions.",
+        hiMinus: "शुल्क या अन्य लागतों का उल्लेख है। राशि, कर और शर्तें जाँचें।",
+        verify: "Ask for a complete written list of fees and charges."
+      },
+      {
+        re: /late payment fee|late fee|penal interest|default charge|bounce charge|overdue charge|जुर्माना/i,
+        minus: "Late-payment or default charges are mentioned. Check when and how they apply.",
+        hiMinus: "देरी या डिफॉल्ट के शुल्क का उल्लेख है। लागू होने की शर्तें जाँचें।",
+        verify: "Confirm late-payment penalties and default charges in writing."
+      },
+      {
+        re: /prepayment|foreclosure|pre.?closure|early repayment|part payment/i,
+        plus: "Prepayment or foreclosure terms appear. Check the exact conditions and charges.",
+        hiPlus: "समय से पहले भुगतान या फोरक्लोज़र की शर्तें दिखाई देती हैं। शुल्क और नियम जाँचें。",
+        verify: "Confirm prepayment options and any foreclosure fees.",
+        hiVerify: "समय से पहले भुगतान के विकल्प और फोरक्लोज़र शुल्क की पुष्टि करें।"
+      },
+      {
+        re: /floating rate|variable rate|rate may change|subject to revision|reset date/i,
+        minus: "The interest rate may change. This could affect EMI or the repayment period.",
+        hiMinus: "ब्याज दर बदल सकती है। इससे EMI या भुगतान अवधि प्रभावित हो सकती है।",
+        verify: "Ask how rate changes affect EMI and the repayment period."
+      },
+      {
+        re: /advance fee|upfront fee|pay.*before.*loan|advance payment|security deposit|पहले.*शुल्क/i,
+        minus: "Wording related to an advance payment appears. Verify the demand independently before paying.",
+        hiMinus: "अग्रिम भुगतान से जुड़े शब्द दिखाई देते हैं। भुगतान से पहले माँग की स्वतंत्र पुष्टि करें।",
+        verify: "Verify any advance-payment demand directly through the lender's official contact details."
+      },
+      {
+        re: /guaranteed approval|100% approval|no rejection|guaranteed loan/i,
+        minus: "Guaranteed-approval wording appears. Treat such claims cautiously and verify the lender.",
+        hiMinus: "गारंटीड मंज़ूरी का दावा दिखाई देता है। सावधानी रखें और ऋणदाता की पुष्टि करें।"
+      },
+      {
+        re: /otp|password|pin number|remote access|share.*bank details/i,
+        minus: "Wording related to sensitive credentials or access appears. Never share OTPs, passwords or PINs.",
+        hiMinus: "संवेदनशील जानकारी या पहुँच से जुड़े शब्द दिखाई देते हैं। OTP, पासवर्ड या PIN साझा न करें।"
+      },
+      {
+        re: /insurance premium|credit insurance|loan protection insurance/i,
+        minus: "Insurance-related terms appear. Verify whether insurance is optional and what it costs.",
+        hiMinus: "बीमा से जुड़ी शर्तें दिखाई देती हैं। पता करें कि बीमा वैकल्पिक है या अनिवार्य और इसकी लागत क्या है।",
+        verify: "Confirm insurance costs and whether the policy is optional."
+      },
+      {
+        re: /grievance redressal|grievance officer|customer complaint|complaint mechanism/i,
+        plus: "A customer grievance or complaint process appears to be mentioned. Verify its contact details.",
+        hiPlus: "शिकायत प्रक्रिया का उल्लेख दिखाई देता है। संपर्क विवरण की पुष्टि करें।"
+      }
+    ];
+
+    checks.forEach(c => {
+      const found = c.re.test(t);
+      if (found) {
+        if (c.plus) plus.push(language() ? (c.hiPlus || c.plus) : c.plus);
+        if (c.minus) minus.push(language() ? (c.hiMinus || c.minus) : c.minus);
+        if (c.verify) verify.push(language() ? (c.hiVerify || c.verify) : c.verify);
+      } else if (c.verify) {
+        verify.push(language() ? (c.hiVerify || c.verify) : c.verify);
+      }
+    });
+
+    if (!plus.length) {
+      plus.push(language()
+        ? "इस स्वचालित जाँच में किसी संभावित लाभ की पुष्टि नहीं हुई।"
+        : "No potential benefit could be confirmed by this automated check.");
+    }
+
+    if (!minus.length) {
+      minus.push(language()
+        ? "चुने गए जोखिम वाले शब्द नहीं मिले। इसका अर्थ यह नहीं कि लोन सुरक्षित है।"
+        : "No selected risk wording was detected. This does not prove that the loan is safe.");
+    }
+
+    if (!verify.length) {
+      verify.push(language()
+        ? "पूरे समझौते और सभी संलग्न दस्तावेज़ों की जाँच करें।"
+        : "Review the complete agreement and all attached schedules.");
+    }
+
+    return { plus, minus, verify };
+  }
+
+  function makeReport(source, sourceName) {
+    const findings = inspectText(source);
+    const figures = getFigures(source);
+
+    const riskMatch = txt("enhancedReview").match(/(?:score|स्कोर)[^\d]{0,20}(\d{1,3})\s*\/\s*100/i);
+    const score = riskMatch ? riskMatch[1] + "/100" : "Not reliably determined";
+
+    const not = language() ? "नहीं मिला" : "Not detected";
+    const figureLines = [
+      `${language() ? "लोन राशि" : "Loan amount"}: ${figures.amount !== null ? money(figures.amount) : not}`,
+      `${language() ? "वार्षिक ब्याज दर" : "Annual interest rate"}: ${figures.rate !== null ? figures.rate + "%" : not}`,
+      `${language() ? "अवधि" : "Tenure"}: ${figures.months ? figures.months + " " + (language() ? "महीने" : "months") : not}`,
+      `${language() ? "मासिक EMI" : "Monthly EMI"}: ${figures.emi !== null ? money(figures.emi) : not}`,
+      `${language() ? "कुल अनुमानित भुगतान" : "Estimated total repayment"}: ${figures.total !== null ? money(figures.total) : not}`,
+      `${language() ? "अनुमानित ब्याज" : "Estimated interest"}: ${figures.interest !== null ? money(figures.interest) : not}`
+    ];
+
+    const nextSteps = language() ? [
+      "ऋणदाता की आधिकारिक जानकारी से उसकी पहचान सत्यापित करें।",
+      "ब्याज, EMI, शुल्क, जुर्माने और भुगतान की तारीखों की लिखित पुष्टि लें।",
+      "अस्पष्ट शर्तों को समझे बिना हस्ताक्षर या भुगतान न करें।",
+      "मूल समझौते और सभी संलग्न तालिकाओं की जाँच करें।"
+    ] : [
+      "Verify the lender using its official contact details and sources.",
+      "Get the interest rate, EMI, fees, penalties and due dates confirmed in writing.",
+      "Do not sign or pay until unclear terms have been explained.",
+      "Review the original agreement and all attached schedules."
+    ];
+
+    return {
+      title: "LoanShield AI — Customer Loan Review",
+      sourceName,
+      plus: findings.plus,
+      minus: findings.minus,
+      verify: findings.verify,
+      figures: figureLines,
+      score,
+      nextSteps,
+      disclaimer: disclaimer()
+    };
+  }
+
+  function listHTML(items) {
+    return items.map(x => "<li>" + escapeHTML(x) + "</li>").join("");
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[c]));
+  }
+
+  function renderCustomerReport(report) {
+    currentReport = report;
+
+    let panel = $("customerPlusMinusReport");
+    if (!panel) {
+      panel = document.createElement("section");
+      panel.id = "customerPlusMinusReport";
+      panel.className = "card";
+
+      const reportCard = $("reportTitle")?.closest(".card");
+      if (reportCard) {
+        reportCard.parentNode.insertBefore(panel, reportCard);
+      } else {
+        document.querySelector("main").appendChild(panel);
+      }
+    }
+
+    panel.innerHTML = `
+      <h2>${language() ? "📋 ग्राहक की PLUS / MINUS रिपोर्ट" : "📋 Customer PLUS / MINUS Report"}</h2>
+      <p>${language() ? "स्रोत" : "Source"}: ${escapeHTML(report.sourceName)}</p>
+
+      <h3 class="good">${language() ? "＋ PLUS — संभावित लाभ" : "＋ PLUS — Potential benefits"}</h3>
+      <ul>${listHTML(report.plus)}</ul>
+
+      <h3 class="bad">${language() ? "− MINUS — जोखिम और नुकसान" : "− MINUS — Risks and disadvantages"}</h3>
+      <ul>${listHTML(report.minus)}</ul>
+
+      <h3>${language() ? "❓ नहीं मिला / पुष्टि करें" : "❓ Not found / Verify"}</h3>
+      <ul>${listHTML(report.verify)}</ul>
+
+      <h3>${language() ? "🧮 लोन की राशि और अनुमान" : "🧮 Loan figures and estimates"}</h3>
+      <ul>${listHTML(report.figures)}</ul>
+
+      <p class="small">${escapeHTML(language()
+        ? "ध्यान दें: जहाँ जानकारी नहीं मिली, उसका अर्थ यह नहीं कि वह शर्त मौजूद नहीं है।"
+        : "Note: If information was not detected, that does not mean the term is absent from the agreement.")}</p>
+
+      <h3>${language() ? "✅ ग्राहक के अगले कदम" : "✅ Customer next steps"}</h3>
+      <ul>${listHTML(report.nextSteps)}</ul>
+
+      <div class="notice"><strong>${language() ? "महत्वपूर्ण अस्वीकरण" : "Important disclaimer"}</strong><p>${escapeHTML(report.disclaimer)}</p></div>
+
+      <button type="button" id="downloadCustomerReport" class="green">${language() ? "रिपोर्ट डाउनलोड करें (.txt)" : "Download Full Report (.txt)"}</button>
+      <button type="button" id="printCustomerReport" class="secondary">${language() ? "प्रिंट / PDF में सेव करें" : "Print / Save as PDF"}</button>
+    `;
+
+    $("downloadCustomerReport").onclick = downloadCustomerReport;
+    $("printCustomerReport").onclick = () => {
+      window.print();
+    };
+  }
+
+  function reportAsText(report) {
+    const section = (title, items) => "\n\n" + title + "\n" + items.map(x => "+ " + x).join("\n");
+    return report.title +
+      "\nSource: " + report.sourceName +
+      "\nPreliminary warning score: " + report.score +
+      section("PLUS — Potential benefits", report.plus) +
+      section("MINUS — Risks and disadvantages", report.minus) +
+      section("NOT FOUND / VERIFY", report.verify) +
+      section("LOAN FIGURES", report.figures) +
+      section("CUSTOMER NEXT STEPS", report.nextSteps) +
+      "\n\nDISCLAIMER\n" + report.disclaimer;
+  }
+
+  function downloadCustomerReport() {
+    if (!currentReport) {
+      alert(language()
+        ? "पहले लोन ऑफर या PDF की जाँच करें।"
+        : "Please check a loan offer or analyze a PDF first.");
+      return;
+    }
+
+    const blob = new Blob([reportAsText(currentReport)], {
+      type: "text/plain;charset=utf-8"
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "LoanShield_AI_Customer_Report.txt";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  /* Extend the existing manual loan checker. */
+  if (typeof oldCheckOffer === "function") {
+    window.checkOffer = function () {
+      oldCheckOffer.apply(this, arguments);
+      const source = [
+        val("lender"),
+        val("offer"),
+        $("manualResult")?.innerText || ""
+      ].join("\n");
+
+      lastReport = reportAsText(makeReport(
+        source,
+        language() ? "मैनुअल लोन ऑफर" : "Manual loan offer"
+      ));
+      renderCustomerReport(currentReport);
+    };
+  }
+
+  /* Extend the existing PDF analyzer without replacing PDF extraction. */
+  if (typeof oldRenderPDFAnalysis === "function") {
+    window.renderPDFAnalysis = function (text) {
+      oldRenderPDFAnalysis.apply(this, arguments);
+      currentSourceText = String(text || "");
+      const report = makeReport(
+        currentSourceText,
+        $("pdfFile")?.files?.[0]?.name || "Uploaded PDF"
+      );
+      renderCustomerReport(report);
+      lastReport = reportAsText(report);
+    };
+  }
+
+  /* Include manual calculator results in the customer report. */
+  if (typeof oldCalculateLoan === "function") {
+    window.calculateLoan = function () {
+      oldCalculateLoan.apply(this, arguments);
+
+      const p = Number(val("principal"));
+      const rate = Number(val("interest"));
+      const n = Number(val("months"));
+
+      if (!(p > 0) || !Number.isFinite(rate) || rate < 0 ||
+          rate > 100 || !(n > 0) || n > 600) return;
+
+      const r = rate / 1200;
+      const emi = r === 0
+        ? p / n
+        : p * r * Math.pow(1 + r, n) /
+          (Math.pow(1 + r, n) - 1);
+      const total = emi * n;
+
+      const source = currentSourceText ||
+        [val("lender"), val("offer")].join("\n");
+
+      const report = makeReport(
+        source + "\nLoan principal: " + p +
+        "\nInterest rate: " + rate + "%" +
+        "\nTenure: " + n + " months" +
+        "\nMonthly EMI: " + emi,
+        language() ? "लोन कैलकुलेटर" : "Loan calculator"
+      );
+
+      report.figures = [
+        `${language() ? "लोन राशि" : "Loan amount"}: ${money(p)}`,
+        `${language() ? "वार्षिक ब्याज दर" : "Annual interest rate"}: ${rate}%`,
+        `${language() ? "अवधि" : "Tenure"}: ${n} ${language() ? "महीने" : "months"}`,
+        `${language() ? "मासिक EMI" : "Monthly EMI"}: ${money(emi)}`,
+        `${language() ? "कुल अनुमानित भुगतान" : "Estimated total repayment"}: ${money(total)}`,
+        `${language() ? "अनुमानित ब्याज" : "Estimated interest"}: ${money(total - p)}`
+      ];
+
+      renderCustomerReport(report);
+      lastReport = reportAsText(report);
+    };
+  }
+
+  /* Make the existing report-download button include PLUS/MINUS findings. */
+  window.downloadReport = function () {
+    if (currentReport) {
+      downloadCustomerReport();
+      return;
+    }
+
+    const content = language()
+      ? "LoanShield AI — प्रारंभिक रिपोर्ट\nपहले लोन ऑफर या PDF की जाँच करें।\n\n" + disclaimer()
+      : "LoanShield AI — Preliminary Report\nPlease check a loan offer or analyze a PDF first.\n\n" + disclaimer();
+
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "LoanShield_AI_Report.txt";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  /* Refresh the report language when the user switches English/Hindi. */
+  const oldSetLanguage = window.setLanguage;
+  if (typeof oldSetLanguage === "function") {
+    window.setLanguage = function (v) {
+      oldSetLanguage.apply(this, arguments);
+      if (currentReport) {
+        const refreshed = makeReport(
+          currentSourceText || val("offer"),
+          currentReport.sourceName
+        );
+        renderCustomerReport(refreshed);
+      }
+    };
+  }
+})();
+
 </script>
 </body>
 </html>
