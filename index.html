@@ -3,326 +3,374 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#14264a">
-<title>LoanShield AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#102a43">
+<title>LoanShield AI - Loan Agreement Checker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-:root{--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#657187;--primary:#245eea;--border:#e1e7f0;--soft:#eaf0ff}
+:root{--navy:#102a43;--blue:#1769aa;--bg:#f2f6fb;--green:#13795b;--red:#b42318}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text);transition:.2s;line-height:1.5}
-body.dark{--bg:#101827;--card:#1b2638;--text:#f2f5fb;--muted:#b3bfd1;--primary:#78a0ff;--border:#344155;--soft:#263858}
-header{background:#14264a;color:white;padding:16px}
-.top{max-width:920px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font-size:22px;font-weight:800;white-space:nowrap}.brand span{color:#75a2ff}
-.controls{display:flex;gap:8px;align-items:center}
-button,select,input,textarea{font:inherit;border-radius:10px}
-button{border:0;padding:12px;cursor:pointer;font-weight:700}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #8bb4ff;outline-offset:2px}
-.langSelect,.theme{background:#263c63;color:white;border:1px solid #536b91}
-.langSelect{max-width:150px;padding:10px 7px}.theme{min-width:48px;font-size:21px}
-main{max-width:920px;padding:20px 14px 40px;margin:auto}
-.hero{background:linear-gradient(135deg,#1b4fc4,#673bd2);color:white;border-radius:25px;padding:26px 22px;margin-bottom:18px}
-.hero h1{font-size:28px;margin:0 0 10px;line-height:1.25}.hero p{margin:0;font-size:17px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:21px;margin:17px 0;min-width:0}
-h2{font-size:21px;margin:0 0 14px}h3{font-size:17px;margin:0 0 8px}
-label{display:block;font-weight:700;margin:15px 0 7px}
-input,textarea,.field{width:100%;padding:13px;background:var(--bg);color:var(--text);border:1px solid var(--border);font-size:16px}
-textarea{min-height:105px;resize:vertical}
-button.primary{width:100%;margin-top:17px;background:var(--primary);color:white;padding:14px}
-button.secondary{background:var(--soft);color:var(--text);border:1px solid var(--border)}
-button:disabled{opacity:.5;cursor:not-allowed}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.tile{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;min-width:0}
-.tile p,.muted,.note{color:var(--muted);font-size:14px}
-.note{line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.actions button{flex:1}
-.pill{display:inline-block;border-radius:30px;padding:6px 12px;background:var(--soft);font-weight:700;font-size:13px}
-.resultbox{padding:14px;border-radius:13px;background:var(--bg);border:1px solid var(--border);margin:10px 0}
-.score{font-size:36px;font-weight:800;color:var(--primary);margin:8px 0}
-ul{padding-inline-start:22px;line-height:1.8}
-a{color:var(--primary);overflow-wrap:anywhere}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 20px 30px}
-.hidden{display:none!important}
-hr{border:0;border-top:1px solid var(--border);margin:20px 0}
-small{color:var(--muted)}
-html[dir=rtl] body{text-align:right}
-html[dir=rtl] ul{padding-inline-start:0;padding-inline-end:22px}
-html[dir=rtl] .top{direction:rtl}
-@media(max-width:540px){.grid{grid-template-columns:1fr}.brand{font-size:18px}.hero h1{font-size:25px}.card{padding:16px}.langSelect{max-width:120px;font-size:13px}.top{gap:7px}.controls{gap:5px}}
-@media print{header,.hero,.no-print,footer{display:none!important}body{background:white;color:black}.card,.tile{box-shadow:none;border:1px solid #bbb;break-inside:avoid}main{max-width:100%;padding:0}.hidden{display:none!important}a{color:black}}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#243447}
+header{background:var(--navy);color:white;padding:24px 16px;text-align:center}
+header h1{margin:0 0 8px;font-size:28px}
+header p{margin:0;color:#d9e8f5}
+main{max-width:850px;margin:24px auto;padding:0 14px}
+.card{background:white;border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 3px 15px #18334d12}
+h2{margin-top:0;color:var(--navy);font-size:21px}
+label{display:block;font-weight:bold;margin:14px 0 8px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ccd6e0;border-radius:8px;font-size:16px;background:white}
+button{border:0;border-radius:8px;padding:13px 17px;background:var(--blue);color:white;font-weight:bold;font-size:16px;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+button.secondary{background:#e8eef5;color:var(--navy)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.notice{background:#edf6ff;padding:12px;border-radius:8px;line-height:1.5;font-size:14px}
+.status{margin-top:12px;font-weight:bold;overflow-wrap:anywhere}
+.result{border-left:4px solid var(--blue);background:#f7faff;padding:13px;margin:10px 0;border-radius:5px;line-height:1.55}
+.result.warning{border-color:#d97706}
+.result.danger{border-color:var(--red)}
+.result.good{border-color:var(--green)}
+.tag{display:inline-block;background:#e8eef5;padding:4px 8px;border-radius:6px;font-size:13px;margin:3px}
+footer{text-align:center;padding:22px;color:#607080;font-size:13px}
+.hidden{display:none}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit}
 </style>
 </head>
 <body>
 <header>
- <div class="top">
-  <div class="brand">🛡️ LoanShield <span>AI</span></div>
-  <div class="controls">
-   <select id="languageSelect" class="langSelect" aria-label="Language">
-    <option value="en">English</option><option value="hi">हिन्दी</option>
-    <option value="ur">اردو</option><option value="pa">ਪੰਜਾਬੀ</option>
-    <option value="ml">മലയാളം</option><option value="kn">ಕನ್ನಡ</option>
-    <option value="gu">ગુજરાતી</option><option value="bn">বাংলা</option>
-    <option value="ta">தமிழ்</option><option value="te">తెలుగు</option>
-    <option value="mr">मराठी</option>
-   </select>
-   <button class="theme" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
-  </div>
- </div>
+<h1>🛡️ LoanShield AI</h1>
+<p id="subtitle">Loan Agreement PDF Checker</p>
 </header>
 
 <main>
- <section class="hero">
-  <h1 data-i="heroTitle">Protect Yourself Before Taking a Loan</h1>
-  <p data-i="heroText">Review loan offers, identify warning signs, and make informed borrowing decisions.</p>
- </section>
+<section class="card">
+<label for="language" id="languageLabel">Language / भाषा</label>
+<select id="language" onchange="setLanguage()">
+<option value="en">English</option>
+<option value="hi">हिन्दी</option>
+</select>
 
- <section class="card">
-  <h2 data-i="reviewTitle">🔎 Review a Loan Offer</h2>
-  <label for="company" data-i="companyLabel">Bank / Lender Name</label>
-  <input id="company" maxlength="150" autocomplete="off" data-ph="companyPH" placeholder="Enter bank or lending app name">
+<h2 id="uploadHeading">Check Your Loan Agreement</h2>
+<p id="intro">Upload a text-based loan agreement PDF to extract its text and check for potentially concerning terms.</p>
 
-  <label for="offer" data-i="offerLabel">Loan Offer or Message</label>
-  <textarea id="offer" maxlength="12000" data-ph="offerPH" placeholder="Paste the offer or suspicious message here. Remove personal details first."></textarea>
+<label for="loanPdf" id="fileLabel">Choose loan agreement PDF</label>
+<input type="file" id="loanPdf" accept=".pdf,application/pdf">
 
-  <label for="fees" data-i="feeLabel">Are fees clearly explained?</label>
-  <select id="fees" class="field">
-   <option value="unknown" data-i="unknown">Not sure</option>
-   <option value="yes" data-i="feeYes">Yes, clearly explained</option>
-   <option value="no" data-i="feeNo">No, unclear or hidden</option>
-  </select>
+<div class="actions">
+<button id="analyzeBtn" onclick="analyzeLoanPDF()">Extract &amp; Analyze PDF</button>
+<button class="secondary" id="clearBtn" onclick="clearResults()">Clear</button>
+</div>
 
-  <label for="lender" data-i="regLabel">Lender verification status</label>
-  <select id="lender" class="field">
-   <option value="unknown" data-i="unknown">Not sure</option>
-   <option value="verified" data-i="verified">Independently verified</option>
-   <option value="unverified" data-i="unverified">Unverified / suspicious</option>
-  </select>
+<div class="status" id="status" role="status" aria-live="polite"></div>
 
-  <label for="advance" data-i="advanceLabel">Is advance payment demanded before disbursal?</label>
-  <select id="advance" class="field">
-   <option value="unknown" data-i="unknown">Not sure</option>
-   <option value="no" data-i="no">No</option>
-   <option value="yes" data-i="yes">Yes</option>
-  </select>
-  <button class="primary" id="reviewBtn" data-i="reviewBtn">Check Loan Safety</button>
-  <p class="note" data-i="privacyNote">Your form details are processed in this page and are not saved by this app. Avoid entering account numbers, Aadhaar, passwords, PINs or OTPs.</p>
- </section>
+<div class="notice" style="margin-top:16px" id="privacyNotice">
+<strong>Privacy:</strong> PDF text is processed in your browser. PDF.js is loaded from a CDN, so an internet connection is required. This tool does not send your document to an AI service.
+</div>
+</section>
 
- <section class="card hidden" id="result" aria-live="polite">
-  <h2 data-i="resultTitle">Your Preliminary Review</h2>
-  <span id="riskBadge" class="pill"></span>
-  <div class="score" id="score">—</div>
-  <p id="scoreText" class="muted"></p>
-  <div class="resultbox">
-   <h3 data-i="redTitle">🚩 Warning Signs</h3>
-   <ul id="redList"></ul>
-  </div>
-  <div class="resultbox">
-   <h3 data-i="greenTitle">✅ Recommended Actions</h3>
-   <ul id="greenList"></ul>
-  </div>
-  <p class="note" data-i="scoreDisclaimer">This is a preliminary checklist, not a verified fraud detector. A low score does not prove that a lender is legitimate.</p>
-  <div class="actions no-print">
-   <button class="secondary" id="shareBtn" data-i="shareBtn">Share on WhatsApp</button>
-   <button class="secondary" id="printBtn" data-i="printBtn">Print / Save PDF</button>
-   <button class="secondary" id="resetBtn" data-i="resetBtn">Clear Form</button>
-  </div>
- </section>
+<section class="card hidden" id="resultsCard">
+<h2 id="resultsHeading">Analysis Results</h2>
+<div id="summary"></div>
+<div id="findings"></div>
+<div class="actions">
+<button onclick="downloadReport()" id="downloadBtn">Download Text Report</button>
+<button class="secondary" onclick="toggleExtracted()" id="textBtn">Show Extracted Text</button>
+</div>
+<div id="extractedWrap" class="hidden">
+<h2 id="extractedHeading" style="margin-top:20px">Extracted PDF Text</h2>
+<textarea id="extractedText" rows="12" readonly></textarea>
+</div>
+</section>
 
- <section class="grid">
-  <div class="tile"><h3 data-i="redCardTitle">🚩 Common Red Flags</h3><p data-i="redCardText">Upfront payment demands, guaranteed approval, pressure tactics, and requests for OTPs or PINs.</p></div>
-  <div class="tile"><h3 data-i="greenCardTitle">🟢 Safer Borrowing</h3><p data-i="greenCardText">Verify the lender independently, read the agreement, compare the APR and fees, and keep copies.</p></div>
- </section>
-
- <section class="card">
-  <h2 data-i="verifyTitle">🏦 Verify a Lender</h2>
-  <p data-i="verifyText">Use official sources to check the legal lender name and whether the institution is authorised. A website or app logo alone is not proof.</p>
-  <div class="actions">
-   <a href="https://www.rbi.org.in/" target="_blank" rel="noopener noreferrer" data-i="rbiLink">Open official RBI website ↗</a>
-   <a href="https://sachet.rbi.org.in/" target="_blank" rel="noopener noreferrer" data-i="sachetLink">RBI Sachet portal ↗</a>
-  </div>
-  <p class="note" data-i="verifyNote">These links provide official resources; this app does not directly verify any lender or guarantee a search result.</p>
- </section>
-
- <section class="card">
-  <h2 data-i="emiTitle">🧮 EMI and Loan Cost Calculator</h2>
-  <p class="muted" data-i="emiText">Estimate monthly repayments. Enter the annual interest rate and loan term.</p>
-  <div class="grid">
-   <div><label for="principal" data-i="principalLabel">Loan amount (₹)</label><input id="principal" type="number" min="1" max="100000000000" step="any" value="100000"></div>
-   <div><label for="rate" data-i="rateLabel">Annual interest (%)</label><input id="rate" type="number" min="0" max="100" step="any" value="12"></div>
-   <div><label for="months" data-i="monthsLabel">Loan term (months)</label><input id="months" type="number" min="1" max="600" step="1" value="12"></div>
-   <div><label for="processing" data-i="processingLabel">Processing fee (₹)</label><input id="processing" type="number" min="0" max="100000000" step="any" value="0"></div>
-  </div>
-  <button class="primary" id="emiBtn" data-i="emiBtn">Calculate EMI</button>
-  <div id="emiResult" class="resultbox hidden" aria-live="polite">
-   <p><span data-i="monthlyEMI">Monthly EMI</span>: <strong id="emiValue"></strong></p>
-   <p><span data-i="totalInterest">Total interest</span>: <strong id="interestValue"></strong></p>
-   <p><span data-i="totalRepay">Total repayments</span>: <strong id="repayValue"></strong></p>
-   <p><span data-i="totalCost">Repayments + processing fee</span>: <strong id="costValue"></strong></p>
-  </div>
-  <p class="note" data-i="emiNote">Estimate only. Actual lender calculations, taxes, insurance, variable rates and other charges may differ.</p>
- </section>
-
- <section class="card">
-  <h2 data-i="stepsTitle">🛡️ Before You Accept a Loan</h2>
-  <ul>
-   <li data-i="step1">Verify the lender through official sources.</li>
-   <li data-i="step2">Read the full agreement, APR and all fees.</li>
-   <li data-i="step3">Never share OTPs, PINs or banking passwords.</li>
-   <li data-i="step4">Do not pay suspicious advance fees to release a loan.</li>
-   <li data-i="step5">Report suspected fraud to your bank and relevant authorities.</li>
-  </ul>
- </section>
+<section class="card">
+<h2 id="limitsHeading">Important Information</h2>
+<ul id="limits">
+<li>This tool performs basic keyword checks, not a legal review or definitive fraud detection.</li>
+<li>It cannot confirm whether a lender or agreement is genuine.</li>
+<li>Scanned/image-only PDFs may not contain extractable text; OCR is not included.</li>
+<li>Always verify the lender, interest rate, fees, penalties and repayment terms independently.</li>
+</ul>
+</section>
 </main>
-<footer data-i="footerText">LoanShield AI · Awareness tool only. No financial or safety guarantee.</footer>
+
+<footer>LoanShield AI · Preliminary document screening tool</footer>
 
 <script>
-"use strict";
-const $=id=>document.getElementById(id);
-const LANG_KEY="loanshield-language",THEME_KEY="loanshield-dark-mode";
-const messages={
-en:{
-heroTitle:"Protect Yourself Before Taking a Loan",heroText:"Review loan offers, identify warning signs, and make informed borrowing decisions.",reviewTitle:"🔎 Review a Loan Offer",companyLabel:"Bank / Lender Name",companyPH:"Enter bank or lending app name",offerLabel:"Loan Offer or Message",offerPH:"Paste the offer or suspicious message here. Remove personal details first.",feeLabel:"Are fees clearly explained?",unknown:"Not sure",feeYes:"Yes, clearly explained",feeNo:"No, unclear or hidden",regLabel:"Lender verification status",verified:"Independently verified",unverified:"Unverified / suspicious",advanceLabel:"Is advance payment demanded before disbursal?",no:"No",yes:"Yes",reviewBtn:"Check Loan Safety",privacyNote:"Your form details are processed in this page and are not saved by this app. Avoid entering account numbers, Aadhaar, passwords, PINs or OTPs.",resultTitle:"Your Preliminary Review",redTitle:"🚩 Warning Signs",greenTitle:"✅ Recommended Actions",scoreDisclaimer:"This is a preliminary checklist, not a verified fraud detector. A low score does not prove that a lender is legitimate.",shareBtn:"Share on WhatsApp",printBtn:"Print / Save PDF",resetBtn:"Clear Form",redCardTitle:"🚩 Common Red Flags",redCardText:"Upfront payment demands, guaranteed approval, pressure tactics, and requests for OTPs or PINs.",greenCardTitle:"🟢 Safer Borrowing",greenCardText:"Verify the lender independently, read the agreement, compare the APR and fees, and keep copies.",verifyTitle:"🏦 Verify a Lender",verifyText:"Use official sources to check the legal lender name and whether the institution is authorised. A website or app logo alone is not proof.",rbiLink:"Open official RBI website ↗",sachetLink:"RBI Sachet portal ↗",verifyNote:"These links provide official resources; this app does not directly verify any lender or guarantee a search result.",emiTitle:"🧮 EMI and Loan Cost Calculator",emiText:"Estimate monthly repayments. Enter the annual interest rate and loan term.",principalLabel:"Loan amount (₹)",rateLabel:"Annual interest (%)",monthsLabel:"Loan term (months)",processingLabel:"Processing fee (₹)",emiBtn:"Calculate EMI",monthlyEMI:"Monthly EMI",totalInterest:"Total interest",totalRepay:"Total repayments",totalCost:"Repayments + processing fee",emiNote:"Estimate only. Actual lender calculations, taxes, insurance, variable rates and other charges may differ.",stepsTitle:"🛡️ Before You Accept a Loan",step1:"Verify the lender through official sources.",step2:"Read the full agreement, APR and all fees.",step3:"Never share OTPs, PINs or banking passwords.",step4:"Do not pay suspicious advance fees to release a loan.",step5:"Report suspected fraud to your bank and relevant authorities.",footerText:"LoanShield AI · Awareness tool only. No financial or safety guarantee.",high:"High risk indicators",medium:"Caution advised",low:"Fewer warning indicators",noRisk:"No major selected warning indicators",scoreLabel:"Preliminary indicator score — not a probability of fraud.",enter:"Enter a lender name or offer message to review.",lenderUnverified:"The lender is marked unverified. Independently confirm its legal name and authorisation.",lenderUnknown:"The lender's authorisation has not been confirmed.",lenderVerified:"You marked the lender as verified. Check that verification using an independent official source.",feesBad:"Fees are reported as unclear or hidden. Request a written, itemised schedule.",feesUnknown:"Fee details are unknown. Read the complete loan agreement.",feesGood:"Fees are reported as clearly explained. Confirm the written terms.",advanceBad:"An advance payment is reported. Treat requests to pay money to release a loan as a serious warning sign.",advanceUnknown:"Advance-payment requirements are unknown. Ask for written terms and independently verify any demand.",advanceGood:"No advance payment demand was selected. This does not establish legitimacy.",keyword:"The message contains wording often associated with risky loan offers. Review it carefully.",actionVerify:"Verify the lender independently using official regulatory sources.",actionNoOTP:"Never share an OTP, PIN, password, or remote-access code.",actionFee:"Do not pay a suspicious fee to unlock or release a loan.",actionContact:"If money has been lost or fraud is suspected, contact your bank promptly and report it to the relevant cybercrime authorities.",actionTerms:"Compare the APR, repayment schedule, penalties and all charges before agreeing.",invalid:"Please enter valid positive loan amount, term, and non-negative fees. Interest must be 0–100%.",whatsTitle:"LoanShield AI preliminary review",reportDisclaimer:"Preliminary checklist only; not proof of fraud or legitimacy."
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+
+const TX = {
+en: {
+subtitle:"Loan Agreement PDF Checker",
+languageLabel:"Language / भाषा",
+uploadHeading:"Check Your Loan Agreement",
+intro:"Upload a text-based loan agreement PDF to extract its text and check for potentially concerning terms.",
+fileLabel:"Choose loan agreement PDF",
+analyzeBtn:"Extract & Analyze PDF",
+clearBtn:"Clear",
+privacyNotice:"<strong>Privacy:</strong> PDF text is processed in your browser. PDF.js is loaded from a CDN, so an internet connection is required. This tool does not send your document to an AI service.",
+resultsHeading:"Analysis Results",
+downloadBtn:"Download Text Report",
+textBtn:"Show Extracted Text",
+extractedHeading:"Extracted PDF Text",
+limitsHeading:"Important Information",
+empty:"Please select a PDF file first.",
+pdfOnly:"Please select a valid PDF file.",
+working:"Reading PDF and checking its text...",
+done:"Analysis complete.",
+failed:"Could not read this PDF. It may be damaged, encrypted, or image-only.",
+noText:"No selectable text was found. This may be a scanned PDF. OCR is not included.",
+pages:"Pages",
+words:"Words extracted",
+findings:"Potential points to review",
+none:"No matching warning keywords were found. This does not mean the agreement is safe.",
+disclaimer:"This is a preliminary keyword check, not legal advice, fraud verification, or a definitive risk assessment.",
+downloadReady:"Text report downloaded.",
+show:"Show Extracted Text",
+hide:"Hide Extracted Text",
+limits:[
+"This tool performs basic keyword checks, not a legal review or definitive fraud detection.",
+"It cannot confirm whether a lender or agreement is genuine.",
+"Scanned/image-only PDFs may not contain extractable text; OCR is not included.",
+"Always verify the lender, interest rate, fees, penalties and repayment terms independently."
+],
+checks:[
+["High interest or APR","high interest|very high interest|excessive interest|annual percentage rate|APR"],
+["Late fees or penalties","late fee|late payment|penalty|penalties|default charge"],
+["Prepayment or foreclosure charges","prepayment charge|prepayment penalty|foreclosure charge|early repayment fee"],
+["Collateral or security","collateral|security interest|secured loan|pledge|hypothecation"],
+["Variable interest rate","floating interest|variable interest|rate may change|change in interest rate"],
+["Automatic debit or mandate","automatic debit|auto debit|direct debit|bank mandate|NACH mandate"],
+["Arbitration or dispute terms","arbitration|dispute resolution|jurisdiction|governing law"],
+["Default or acceleration terms","event of default|acceleration clause|entire balance due|default interest"],
+["Additional charges or fees","processing fee|administrative fee|hidden charges|additional charges"],
+["Personal guarantee","personal guarantee|personal guarantor|guarantor liability"]
+]
 },
-hi:{
-heroTitle:"लोन लेने से पहले खुद को सुरक्षित रखें",heroText:"लोन ऑफ़र जाँचें, खतरे के संकेत पहचानें और सोच-समझकर निर्णय लें।",reviewTitle:"🔎 लोन ऑफ़र की जाँच",companyLabel:"बैंक / ऋणदाता का नाम",companyPH:"बैंक या लोन ऐप का नाम लिखें",offerLabel:"लोन ऑफ़र या संदेश",offerPH:"संदेश यहाँ डालें। पहले निजी जानकारी हटा दें।",feeLabel:"क्या शुल्क स्पष्ट हैं?",unknown:"पता नहीं",feeYes:"हाँ, स्पष्ट हैं",feeNo:"नहीं, अस्पष्ट या छिपे हुए",regLabel:"ऋणदाता सत्यापन",verified:"स्वतंत्र रूप से सत्यापित",unverified:"सत्यापित नहीं / संदिग्ध",advanceLabel:"क्या लोन से पहले अग्रिम भुगतान माँगा जा रहा है?",no:"नहीं",yes:"हाँ",reviewBtn:"लोन की सुरक्षा जाँचें",privacyNote:"आपकी जानकारी इस पेज पर संसाधित होती है और ऐप में सहेजी नहीं जाती। खाता नंबर, आधार, पासवर्ड, PIN या OTP न डालें।",resultTitle:"प्रारंभिक समीक्षा",redTitle:"🚩 खतरे के संकेत",greenTitle:"✅ सुझाए गए कदम",scoreDisclaimer:"यह शुरुआती जाँच है, प्रमाणित धोखाधड़ी पहचान नहीं। कम स्कोर से ऋणदाता की वैधता सिद्ध नहीं होती।",shareBtn:"WhatsApp पर साझा करें",printBtn:"प्रिंट / PDF सहेजें",resetBtn:"फ़ॉर्म साफ़ करें",redCardTitle:"🚩 आम खतरे",redCardText:"अग्रिम भुगतान, पक्की मंज़ूरी के दावे, दबाव और OTP या PIN माँगना।",greenCardTitle:"🟢 सुरक्षित उधार",greenCardText:"ऋणदाता की स्वतंत्र जाँच करें, समझौता पढ़ें और सभी शुल्क देखें।",verifyTitle:"🏦 ऋणदाता सत्यापित करें",verifyText:"आधिकारिक स्रोतों से कानूनी नाम और प्राधिकरण जाँचें। केवल वेबसाइट या लोगो प्रमाण नहीं है।",rbiLink:"आधिकारिक RBI वेबसाइट ↗",sachetLink:"RBI Sachet पोर्टल ↗",verifyNote:"ये आधिकारिक संसाधन हैं। ऐप स्वयं किसी ऋणदाता को सत्यापित नहीं करता।",emiTitle:"🧮 EMI और ऋण लागत कैलकुलेटर",emiText:"मासिक किस्त का अनुमान लगाएँ। वार्षिक ब्याज और अवधि भरें।",principalLabel:"लोन राशि (₹)",rateLabel:"वार्षिक ब्याज (%)",monthsLabel:"अवधि (महीने)",processingLabel:"प्रोसेसिंग शुल्क (₹)",emiBtn:"EMI की गणना करें",monthlyEMI:"मासिक EMI",totalInterest:"कुल ब्याज",totalRepay:"कुल भुगतान",totalCost:"भुगतान + प्रोसेसिंग शुल्क",emiNote:"यह अनुमान है। वास्तविक गणना और अन्य शुल्क अलग हो सकते हैं।",stepsTitle:"🛡️ लोन लेने से पहले",step1:"आधिकारिक स्रोतों से ऋणदाता की जाँच करें।",step2:"समझौता, APR और सभी शुल्क पढ़ें।",step3:"OTP, PIN या बैंक पासवर्ड साझा न करें।",step4:"लोन जारी करने के लिए संदिग्ध अग्रिम शुल्क न दें।",step5:"धोखाधड़ी का संदेह हो तो बैंक और संबंधित अधिकारियों से संपर्क करें।",footerText:"LoanShield AI · केवल जागरूकता उपकरण। सुरक्षा की गारंटी नहीं।"
-},
-ur:{
-heroTitle:"قرض لینے سے پہلے خود کو محفوظ رکھیں",heroText:"قرض کی پیشکش دیکھیں اور خطرے کی علامات پہچانیں۔",reviewTitle:"🔎 قرض کی پیشکش کا جائزہ",companyLabel:"بینک / قرض دہندہ کا نام",companyPH:"بینک یا قرض ایپ کا نام لکھیں",offerLabel:"قرض کی پیشکش یا پیغام",offerPH:"پیغام یہاں درج کریں؛ پہلے ذاتی معلومات ہٹا دیں۔",feeLabel:"کیا فیس واضح ہے؟",unknown:"یقین نہیں",feeYes:"ہاں، واضح ہے",feeNo:"نہیں، غیر واضح یا پوشیدہ",regLabel:"قرض دہندہ کی تصدیق",verified:"آزادانہ طور پر تصدیق شدہ",unverified:"غیر تصدیق شدہ / مشکوک",advanceLabel:"کیا قرض سے پہلے پیشگی رقم مانگی جا رہی ہے؟",no:"نہیں",yes:"ہاں",reviewBtn:"قرض کی حفاظت جانچیں",privacyNote:"معلومات اسی صفحے پر استعمال ہوتی ہیں اور محفوظ نہیں کی جاتیں۔ اکاؤنٹ نمبر، پاس ورڈ، PIN یا OTP نہ لکھیں۔",resultTitle:"ابتدائی جائزہ",redTitle:"🚩 خطرے کی علامات",greenTitle:"✅ تجویز کردہ اقدامات",scoreDisclaimer:"یہ ابتدائی فہرست ہے، تصدیق شدہ فراڈ ڈیٹیکٹر نہیں۔",shareBtn:"WhatsApp پر شیئر کریں",printBtn:"پرنٹ / PDF محفوظ کریں",resetBtn:"فارم صاف کریں",redCardTitle:"🚩 عام خطرات",redCardText:"پیشگی رقم، فوری منظوری کے دعوے اور OTP یا PIN مانگنا۔",greenCardTitle:"🟢 محفوظ قرض",greenCardText:"قرض دہندہ کی آزادانہ تصدیق کریں اور شرائط پڑھیں۔",verifyTitle:"🏦 قرض دہندہ کی تصدیق",verifyText:"سرکاری ذرائع سے قانونی نام اور اجازت کی تصدیق کریں۔",rbiLink:"سرکاری RBI ویب سائٹ ↗",sachetLink:"RBI Sachet پورٹل ↗",verifyNote:"ایپ خود قرض دہندہ کی تصدیق نہیں کرتی۔",emiTitle:"🧮 EMI اور قرض کا حساب",emiText:"ماہانہ قسط کا اندازہ لگائیں۔",principalLabel:"قرض کی رقم (₹)",rateLabel:"سالانہ سود (%)",monthsLabel:"مدت (مہینے)",processingLabel:"پروسیسنگ فیس (₹)",emiBtn:"EMI حساب کریں",monthlyEMI:"ماہانہ EMI",totalInterest:"کل سود",totalRepay:"کل ادائیگی",totalCost:"ادائیگی + فیس",emiNote:"یہ صرف اندازہ ہے۔ اصل رقم مختلف ہو سکتی ہے۔",stepsTitle:"🛡️ قرض لینے سے پہلے",step1:"سرکاری ذرائع سے تصدیق کریں۔",step2:"معاہدہ اور تمام فیس پڑھیں۔",step3:"OTP، PIN یا پاس ورڈ نہ بتائیں۔",step4:"مشکوک پیشگی فیس ادا نہ کریں۔",step5:"فراڈ کا شبہ ہو تو بینک سے رابطہ کریں۔",footerText:"LoanShield AI · صرف آگاہی کے لیے؛ ضمانت نہیں۔"
-},
-pa:{
-heroTitle:"ਕਰਜ਼ਾ ਲੈਣ ਤੋਂ ਪਹਿਲਾਂ ਆਪਣੀ ਸੁਰੱਖਿਆ ਕਰੋ",heroText:"ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਜਾਂਚੋ ਅਤੇ ਖ਼ਤਰੇ ਦੇ ਸੰਕੇਤ ਪਛਾਣੋ।",reviewTitle:"🔎 ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਦੀ ਜਾਂਚ",companyLabel:"ਬੈਂਕ / ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦਾ ਨਾਮ",companyPH:"ਬੈਂਕ ਜਾਂ ਕਰਜ਼ਾ ਐਪ ਦਾ ਨਾਮ ਲਿਖੋ",offerLabel:"ਕਰਜ਼ੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਜਾਂ ਸੁਨੇਹਾ",offerPH:"ਸੁਨੇਹਾ ਪਾਓ; ਪਹਿਲਾਂ ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਹਟਾਓ।",feeLabel:"ਕੀ ਫੀਸਾਂ ਸਪਸ਼ਟ ਹਨ?",unknown:"ਪਤਾ ਨਹੀਂ",feeYes:"ਹਾਂ, ਸਪਸ਼ਟ ਹਨ",feeNo:"ਨਹੀਂ, ਅਸਪਸ਼ਟ ਹਨ",regLabel:"ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ",verified:"ਸੁਤੰਤਰ ਤੌਰ 'ਤੇ ਪੁਸ਼ਟੀ ਕੀਤੀ",unverified:"ਅਪੁਸ਼ਟ / ਸ਼ੱਕੀ",advanceLabel:"ਕੀ ਪਹਿਲਾਂ ਅਗਾਊਂ ਪੈਸੇ ਮੰਗੇ ਜਾਂਦੇ ਹਨ?",no:"ਨਹੀਂ",yes:"ਹਾਂ",reviewBtn:"ਕਰਜ਼ੇ ਦੀ ਸੁਰੱਖਿਆ ਜਾਂਚੋ",privacyNote:"ਜਾਣਕਾਰੀ ਇਸ ਪੰਨੇ 'ਤੇ ਹੀ ਵਰਤੀ ਜਾਂਦੀ ਹੈ ਅਤੇ ਸੰਭਾਲੀ ਨਹੀਂ ਜਾਂਦੀ। ਗੁਪਤ ਜਾਣਕਾਰੀ ਨਾ ਪਾਓ।",resultTitle:"ਮੁੱਢਲੀ ਜਾਂਚ",redTitle:"🚩 ਖ਼ਤਰੇ ਦੇ ਸੰਕੇਤ",greenTitle:"✅ ਸਿਫ਼ਾਰਸ਼ੀ ਕਦਮ",scoreDisclaimer:"ਇਹ ਮੁੱਢਲੀ ਜਾਂਚ ਹੈ, ਪੱਕਾ ਧੋਖਾਧੜੀ ਪਤਾ ਕਰਨ ਵਾਲਾ ਸਾਧਨ ਨਹੀਂ।",shareBtn:"WhatsApp 'ਤੇ ਸਾਂਝਾ ਕਰੋ",printBtn:"ਪ੍ਰਿੰਟ / PDF ਸੇਵ ਕਰੋ",resetBtn:"ਫਾਰਮ ਸਾਫ਼ ਕਰੋ",redCardTitle:"🚩 ਆਮ ਖ਼ਤਰੇ",redCardText:"ਅਗਾਊਂ ਫੀਸ, ਪੱਕੀ ਮਨਜ਼ੂਰੀ ਦੇ ਦਾਅਵੇ ਅਤੇ OTP/PIN ਮੰਗਣਾ।",greenCardTitle:"🟢 ਸੁਰੱਖਿਅਤ ਕਰਜ਼ਾ",greenCardText:"ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਸ਼ਰਤਾਂ ਪੜ੍ਹੋ।",verifyTitle:"🏦 ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਜਾਂਚ",verifyText:"ਅਧਿਕਾਰਤ ਸਰੋਤਾਂ ਤੋਂ ਕਾਨੂੰਨੀ ਨਾਮ ਅਤੇ ਮਨਜ਼ੂਰੀ ਦੀ ਜਾਂਚ ਕਰੋ।",rbiLink:"ਅਧਿਕਾਰਤ RBI ਵੈੱਬਸਾਈਟ ↗",sachetLink:"RBI Sachet ਪੋਰਟਲ ↗",verifyNote:"ਇਹ ਐਪ ਆਪਣੇ ਆਪ ਕਰਜ਼ਾ ਦੇਣ ਵਾਲੇ ਦੀ ਪੁਸ਼ਟੀ ਨਹੀਂ ਕਰਦੀ।",emiTitle:"🧮 EMI ਅਤੇ ਕਰਜ਼ਾ ਲਾਗਤ ਕੈਲਕੁਲੇਟਰ",emiText:"ਮਹੀਨਾਵਾਰ ਕਿਸ਼ਤ ਦਾ ਅੰਦਾਜ਼ਾ ਲਗਾਓ।",principalLabel:"ਕਰਜ਼ੇ ਦੀ ਰਕਮ (₹)",rateLabel:"ਸਾਲਾਨਾ ਵਿਆਜ (%)",monthsLabel:"ਮਿਆਦ (ਮਹੀਨੇ)",processingLabel:"ਪ੍ਰੋਸੈਸਿੰਗ ਫੀਸ (₹)",emiBtn:"EMI ਗਿਣੋ",monthlyEMI:"ਮਹੀਨਾਵਾਰ EMI",totalInterest:"ਕੁੱਲ ਵਿਆਜ",totalRepay:"ਕੁੱਲ ਭੁਗਤਾਨ",totalCost:"ਭੁਗਤਾਨ + ਫੀਸ",emiNote:"ਇਹ ਅੰਦਾਜ਼ਾ ਹੈ; ਅਸਲ ਰਕਮ ਵੱਖਰੀ ਹੋ ਸਕਦੀ ਹੈ।",stepsTitle:"🛡️ ਕਰਜ਼ਾ ਲੈਣ ਤੋਂ ਪਹਿਲਾਂ",step1:"ਅਧਿਕਾਰਤ ਸਰੋਤਾਂ ਤੋਂ ਜਾਂਚ ਕਰੋ।",step2:"ਸਮਝੌਤਾ ਅਤੇ ਸਾਰੀਆਂ ਫੀਸਾਂ ਪੜ੍ਹੋ।",step3:"OTP, PIN ਜਾਂ ਪਾਸਵਰਡ ਸਾਂਝੇ ਨਾ ਕਰੋ।",step4:"ਸ਼ੱਕੀ ਅਗਾਊਂ ਫੀਸ ਨਾ ਦਿਓ।",step5:"ਧੋਖਾਧੜੀ ਦਾ ਸ਼ੱਕ ਹੋਵੇ ਤਾਂ ਬੈਂਕ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।",footerText:"LoanShield AI · ਸਿਰਫ਼ ਜਾਗਰੂਕਤਾ ਲਈ; ਕੋਈ ਗਾਰੰਟੀ ਨਹੀਂ।"
-},
-ml:{
-heroTitle:"വായ്പ എടുക്കുന്നതിന് മുമ്പ് സുരക്ഷിതരാകൂ",heroText:"വായ്പാ ഓഫറുകൾ പരിശോധിച്ച് മുന്നറിയിപ്പ് സൂചനകൾ തിരിച്ചറിയുക.",reviewTitle:"🔎 വായ്പാ ഓഫർ പരിശോധിക്കുക",companyLabel:"ബാങ്ക് / വായ്പാദാതാവിന്റെ പേര്",companyPH:"ബാങ്കിന്റെയോ വായ്പാ ആപ്പിന്റെയോ പേര് നൽകുക",offerLabel:"വായ്പാ ഓഫർ അല്ലെങ്കിൽ സന്ദേശം",offerPH:"സന്ദേശം ചേർക്കുക; സ്വകാര്യ വിവരങ്ങൾ ആദ്യം നീക്കുക.",feeLabel:"ഫീസുകൾ വ്യക്തമായിട്ടുണ്ടോ?",unknown:"ഉറപ്പില്ല",feeYes:"അതെ, വ്യക്തമാണ്",feeNo:"ഇല്ല, വ്യക്തമല്ല",regLabel:"വായ്പാദാതാവിന്റെ പരിശോധന",verified:"സ്വതന്ത്രമായി സ്ഥിരീകരിച്ചു",unverified:"സ്ഥിരീകരിച്ചിട്ടില്ല / സംശയാസ്പദം",advanceLabel:"വായ്പയ്ക്ക് മുമ്പ് മുൻകൂർ പണം ആവശ്യപ്പെടുന്നുണ്ടോ?",no:"ഇല്ല",yes:"അതെ",reviewBtn:"വായ്പയുടെ സുരക്ഷ പരിശോധിക്കുക",privacyNote:"വിവരങ്ങൾ ഈ പേജിൽ മാത്രം ഉപയോഗിക്കുന്നു; സംരക്ഷിക്കുന്നില്ല. രഹസ്യ വിവരങ്ങൾ നൽകരുത്.",resultTitle:"പ്രാഥമിക പരിശോധന",redTitle:"🚩 മുന്നറിയിപ്പ് സൂചനകൾ",greenTitle:"✅ ശുപാർശ ചെയ്യുന്ന നടപടികൾ",scoreDisclaimer:"ഇത് പ്രാഥമിക പരിശോധന മാത്രമാണ്; തട്ടിപ്പ് കണ്ടെത്താനുള്ള ഉറപ്പുള്ള സംവിധാനം അല്ല.",shareBtn:"WhatsApp-ൽ പങ്കിടുക",printBtn:"പ്രിന്റ് / PDF",resetBtn:"ഫോം മായ്ക്കുക",redCardTitle:"🚩 സാധാരണ അപകടസൂചനകൾ",redCardText:"മുൻകൂർ ഫീസ്, ഉറപ്പായ അംഗീകാര വാഗ്ദാനങ്ങൾ, OTP/PIN ആവശ്യങ്ങൾ.",greenCardTitle:"🟢 സുരക്ഷിത വായ്പ",greenCardText:"വായ്പാദാതാവിനെ പരിശോധിക്കുകയും നിബന്ധനകൾ വായിക്കുകയും ചെയ്യുക.",verifyTitle:"🏦 വായ്പാദാതാവിനെ പരിശോധിക്കുക",verifyText:"ഔദ്യോഗിക ഉറവിടങ്ങളിൽ നിയമപരമായ പേരും അനുമതിയും പരിശോധിക്കുക.",rbiLink:"ഔദ്യോഗിക RBI വെബ്സൈറ്റ് ↗",sachetLink:"RBI Sachet പോർട്ടൽ ↗",verifyNote:"ഈ ആപ്പ് വായ്പാദാതാവിനെ നേരിട്ട് സ്ഥിരീകരിക്കുന്നില്ല.",emiTitle:"🧮 EMI, വായ്പാ ചെലവ് കാൽക്കുലേറ്റർ",emiText:"പ്രതിമാസ തിരിച്ചടവ് കണക്കാക്കുക.",principalLabel:"വായ്പ തുക (₹)",rateLabel:"വാർഷിക പലിശ (%)",monthsLabel:"കാലാവധി (മാസം)",processingLabel:"പ്രോസസ്സിംഗ് ഫീസ് (₹)",emiBtn:"EMI കണക്കാക്കുക",monthlyEMI:"പ്രതിമാസ EMI",totalInterest:"ആകെ പലിശ",totalRepay:"ആകെ തിരിച്ചടവ്",totalCost:"തിരിച്ചടവ് + ഫീസ്",emiNote:"ഇത് ഏകദേശ കണക്കാണ്; യഥാർത്ഥ തുക വ്യത്യാസപ്പെടാം.",stepsTitle:"🛡️ വായ്പ സ്വീകരിക്കുന്നതിന് മുമ്പ്",step1:"ഔദ്യോഗിക ഉറവിടങ്ങളിൽ പരിശോധിക്കുക.",step2:"കരാറും എല്ലാ ഫീസുകളും വായിക്കുക.",step3:"OTP, PIN, പാസ്‌വേഡ് പങ്കിടരുത്.",step4:"സംശയകരമായ മുൻകൂർ ഫീസ് നൽകരുത്.",step5:"തട്ടിപ്പ് സംശയമുണ്ടെങ്കിൽ ബാങ്കുമായി ബന്ധപ്പെടുക.",footerText:"LoanShield AI · ബോധവൽക്കരണത്തിന് മാത്രം; ഉറപ്പല്ല."
-},
-kn:{
-heroTitle:"ಸಾಲ ಪಡೆಯುವ ಮೊದಲು ನಿಮ್ಮನ್ನು ಸುರಕ್ಷಿತವಾಗಿರಿಸಿಕೊಳ್ಳಿ",heroText:"ಸಾಲದ ಆಫರ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಎಚ್ಚರಿಕೆಯ ಸೂಚನೆಗಳನ್ನು ಗುರುತಿಸಿ.",reviewTitle:"🔎 ಸಾಲದ ಆಫರ್ ಪರಿಶೀಲಿಸಿ",companyLabel:"ಬ್ಯಾಂಕ್ / ಸಾಲದಾತರ ಹೆಸರು",companyPH:"ಬ್ಯಾಂಕ್ ಅಥವಾ ಸಾಲದ ಆ್ಯಪ್ ಹೆಸರು ನಮೂದಿಸಿ",offerLabel:"ಸಾಲದ ಆಫರ್ ಅಥವಾ ಸಂದೇಶ",offerPH:"ಸಂದೇಶ ನಮೂದಿಸುವ ಮೊದಲು ವೈಯಕ್ತಿಕ ಮಾಹಿತಿಯನ್ನು ತೆಗೆದುಹಾಕಿ.",feeLabel:"ಶುಲ್ಕಗಳು ಸ್ಪಷ್ಟವಾಗಿವೆಯೇ?",unknown:"ಖಚಿತವಿಲ್ಲ",feeYes:"ಹೌದು, ಸ್ಪಷ್ಟವಾಗಿದೆ",feeNo:"ಇಲ್ಲ, ಅಸ್ಪಷ್ಟವಾಗಿದೆ",regLabel:"ಸಾಲದಾತರ ಪರಿಶೀಲನೆ",verified:"ಸ್ವತಂತ್ರವಾಗಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ",unverified:"ಪರಿಶೀಲಿಸಿಲ್ಲ / ಅನುಮಾನಾಸ್ಪದ",advanceLabel:"ಸಾಲಕ್ಕೂ ಮೊದಲು ಮುಂಗಡ ಹಣ ಕೇಳಲಾಗುತ್ತಿದೆಯೇ?",no:"ಇಲ್ಲ",yes:"ಹೌದು",reviewBtn:"ಸಾಲದ ಸುರಕ್ಷತೆ ಪರಿಶೀಲಿಸಿ",privacyNote:"ಮಾಹಿತಿ ಈ ಪುಟದಲ್ಲೇ ಬಳಕೆಯಾಗುತ್ತದೆ; ಸಂಗ್ರಹಿಸಲಾಗುವುದಿಲ್ಲ. ಗೌಪ್ಯ ವಿವರಗಳನ್ನು ನಮೂದಿಸಬೇಡಿ.",resultTitle:"ಪ್ರಾಥಮಿಕ ಪರಿಶೀಲನೆ",redTitle:"🚩 ಎಚ್ಚರಿಕೆಯ ಸೂಚನೆಗಳು",greenTitle:"✅ ಶಿಫಾರಸು ಮಾಡಿದ ಕ್ರಮಗಳು",scoreDisclaimer:"ಇದು ಪ್ರಾಥಮಿಕ ಪರಿಶೀಲನೆ ಮಾತ್ರ; ಖಚಿತ ವಂಚನೆ ಪತ್ತೆ ಸಾಧನವಲ್ಲ.",shareBtn:"WhatsApp ನಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಿ",printBtn:"ಮುದ್ರಿಸಿ / PDF ಉಳಿಸಿ",resetBtn:"ಫಾರ್ಮ್ ತೆರವುಗೊಳಿಸಿ",redCardTitle:"🚩 ಸಾಮಾನ್ಯ ಅಪಾಯಗಳು",redCardText:"ಮುಂಗಡ ಶುಲ್ಕ, ಖಚಿತ ಅನುಮೋದನೆಯ ಭರವಸೆ ಮತ್ತು OTP/PIN ಕೇಳುವುದು.",greenCardTitle:"🟢 ಸುರಕ್ಷಿತ ಸಾಲ",greenCardText:"ಸಾಲದಾತರನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಒಪ್ಪಂದ ಓದಿ.",verifyTitle:"🏦 ಸಾಲದಾತರನ್ನು ಪರಿಶೀಲಿಸಿ",verifyText:"ಅಧಿಕೃತ ಮೂಲಗಳಲ್ಲಿ ಕಾನೂನು ಹೆಸರು ಮತ್ತು ಅನುಮತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ.",rbiLink:"ಅಧಿಕೃತ RBI ವೆಬ್‌ಸೈಟ್ ↗",sachetLink:"RBI Sachet ಪೋರ್ಟಲ್ ↗",verifyNote:"ಈ ಆ್ಯಪ್ ಸಾಲದಾತರನ್ನು ನೇರವಾಗಿ ಪರಿಶೀಲಿಸುವುದಿಲ್ಲ.",emiTitle:"🧮 EMI ಮತ್ತು ಸಾಲ ವೆಚ್ಚ ಕ್ಯಾಲ್ಕುಲೇಟರ್",emiText:"ಮಾಸಿಕ ಮರುಪಾವತಿ ಅಂದಾಜಿಸಿ.",principalLabel:"ಸಾಲದ ಮೊತ್ತ (₹)",rateLabel:"ವಾರ್ಷಿಕ ಬಡ್ಡಿ (%)",monthsLabel:"ಅವಧಿ (ತಿಂಗಳು)",processingLabel:"ಪ್ರಕ್ರಿಯಾ ಶುಲ್ಕ (₹)",emiBtn:"EMI ಲೆಕ್ಕಿಸಿ",monthlyEMI:"ಮಾಸಿಕ EMI",totalInterest:"ಒಟ್ಟು ಬಡ್ಡಿ",totalRepay:"ಒಟ್ಟು ಮರುಪಾವತಿ",totalCost:"ಮರುಪಾವತಿ + ಶುಲ್ಕ",emiNote:"ಇದು ಅಂದಾಜು ಮಾತ್ರ; ನಿಜವಾದ ಮೊತ್ತ ಬದಲಾಗಬಹುದು.",stepsTitle:"🛡️ ಸಾಲ ಸ್ವೀಕರಿಸುವ ಮೊದಲು",step1:"ಅಧಿಕೃತ ಮೂಲಗಳಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.",step2:"ಒಪ್ಪಂದ ಮತ್ತು ಎಲ್ಲಾ ಶುಲ್ಕ ಓದಿ.",step3:"OTP, PIN ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಹಂಚಿಕೊಳ್ಳಬೇಡಿ.",step4:"ಅನುಮಾನಾಸ್ಪದ ಮುಂಗಡ ಶುಲ್ಕ ಪಾವತಿಸಬೇಡಿ.",step5:"ವಂಚನೆ ಅನುಮಾನವಿದ್ದರೆ ಬ್ಯಾಂಕ್ ಸಂಪರ್ಕಿಸಿ.",footerText:"LoanShield AI · ಜಾಗೃತಿ ಸಾಧನ ಮಾತ್ರ; ಖಾತರಿಯಲ್ಲ."
-},
-gu:{
-heroTitle:"લોન લેતા પહેલાં પોતાને સુરક્ષિત રાખો",heroText:"લોનની ઑફર તપાસો અને ચેતવણીનાં સંકેતો ઓળખો.",reviewTitle:"🔎 લોનની ઑફર તપાસો",companyLabel:"બૅન્ક / ધિરાણકર્તાનું નામ",companyPH:"બૅન્ક અથવા લોન ઍપનું નામ લખો",offerLabel:"લોનની ઑફર અથવા સંદેશ",offerPH:"સંદેશ લખો; પહેલાં વ્યક્તિગત માહિતી દૂર કરો.",feeLabel:"શું ફી સ્પષ્ટ છે?",unknown:"ખાતરી નથી",feeYes:"હા, સ્પષ્ટ છે",feeNo:"ના, અસ્પષ્ટ છે",regLabel:"ધિરાણકર્તાની ચકાસણી",verified:"સ્વતંત્ર રીતે ચકાસ્યું",unverified:"ચકાસ્યું નથી / શંકાસ્પદ",advanceLabel:"શું લોન પહેલાં આગોતરી ચુકવણી માંગે છે?",no:"ના",yes:"હા",reviewBtn:"લોનની સુરક્ષા તપાસો",privacyNote:"માહિતી આ પેજ પર જ વપરાય છે અને સાચવાતી નથી. ગુપ્ત માહિતી દાખલ કરશો નહીં.",resultTitle:"પ્રાથમિક સમીક્ષા",redTitle:"🚩 ચેતવણીનાં સંકેતો",greenTitle:"✅ સૂચવેલ પગલાં",scoreDisclaimer:"આ પ્રાથમિક તપાસ છે, પ્રમાણિત છેતરપિંડી શોધનાર નથી.",shareBtn:"WhatsApp પર શેર કરો",printBtn:"પ્રિન્ટ / PDF સાચવો",resetBtn:"ફોર્મ સાફ કરો",redCardTitle:"🚩 સામાન્ય જોખમ",redCardText:"આગોતરી ફી, ખાતરીપૂર્વક મંજૂરીના દાવા અને OTP/PIN માગવું.",greenCardTitle:"🟢 સુરક્ષિત ઉધાર",greenCardText:"ધિરાણકર્તાની સ્વતંત્ર ચકાસણી કરો અને કરાર વાંચો.",verifyTitle:"🏦 ધિરાણકર્તાની ચકાસણી",verifyText:"સત્તાવાર સ્ત્રોતોમાં કાનૂની નામ અને મંજૂરી તપાસો.",rbiLink:"સત્તાવાર RBI વેબસાઇટ ↗",sachetLink:"RBI Sachet પોર્ટલ ↗",verifyNote:"આ ઍપ ધિરાણકર્તાની સીધી ચકાસણી કરતી નથી.",emiTitle:"🧮 EMI અને લોન ખર્ચ કેલ્ક્યુલેટર",emiText:"માસિક ચુકવણીનો અંદાજ કાઢો.",principalLabel:"લોનની રકમ (₹)",rateLabel:"વાર્ષિક વ્યાજ (%)",monthsLabel:"સમયગાળો (મહિના)",processingLabel:"પ્રોસેસિંગ ફી (₹)",emiBtn:"EMI ગણો",monthlyEMI:"માસિક EMI",totalInterest:"કુલ વ્યાજ",totalRepay:"કુલ ચુકવણી",totalCost:"ચુકવણી + ફી",emiNote:"આ અંદાજ છે; વાસ્તવિક રકમ અલગ હોઈ શકે છે.",stepsTitle:"🛡️ લોન સ્વીકારતાં પહેલાં",step1:"સત્તાવાર સ્ત્રોતોથી તપાસો.",step2:"કરાર અને બધી ફી વાંચો.",step3:"OTP, PIN અથવા પાસવર્ડ શેર ન કરો.",step4:"શંકાસ્પદ આગોતરી ફી ન ચૂકવો.",step5:"છેતરપિંડીની શંકા હોય તો બૅન્કનો સંપર્ક કરો.",footerText:"LoanShield AI · જાગૃતિ માટેનું સાધન; ખાતરી નથી."
-},
-bn:{
-heroTitle:"ঋণ নেওয়ার আগে নিজেকে সুরক্ষিত রাখুন",heroText:"ঋণের প্রস্তাব যাচাই করুন এবং সতর্কতার লক্ষণ চিনুন।",reviewTitle:"🔎 ঋণের প্রস্তাব যাচাই করুন",companyLabel:"ব্যাঙ্ক / ঋণদাতার নাম",companyPH:"ব্যাঙ্ক বা ঋণ অ্যাপের নাম লিখুন",offerLabel:"ঋণের প্রস্তাব বা বার্তা",offerPH:"বার্তা দিন; আগে ব্যক্তিগত তথ্য সরিয়ে ফেলুন।",feeLabel:"ফি কি স্পষ্ট?",unknown:"নিশ্চিত নই",feeYes:"হ্যাঁ, স্পষ্ট",feeNo:"না, অস্পষ্ট",regLabel:"ঋণদাতার যাচাই",verified:"স্বাধীনভাবে যাচাই করা",unverified:"যাচাই হয়নি / সন্দেহজনক",advanceLabel:"ঋণ দেওয়ার আগে কি অগ্রিম টাকা চাওয়া হচ্ছে?",no:"না",yes:"হ্যাঁ",reviewBtn:"ঋণের নিরাপত্তা যাচাই করুন",privacyNote:"তথ্য এই পেজেই ব্যবহার হয় এবং সংরক্ষণ করা হয় না। গোপন তথ্য দেবেন না।",resultTitle:"প্রাথমিক পর্যালোচনা",redTitle:"🚩 সতর্কতার লক্ষণ",greenTitle:"✅ প্রস্তাবিত পদক্ষেপ",scoreDisclaimer:"এটি প্রাথমিক যাচাই, নিশ্চিত জালিয়াতি শনাক্তকারী নয়।",shareBtn:"WhatsApp-এ শেয়ার করুন",printBtn:"প্রিন্ট / PDF সংরক্ষণ",resetBtn:"ফর্ম পরিষ্কার করুন",redCardTitle:"🚩 সাধারণ ঝুঁকি",redCardText:"অগ্রিম ফি, নিশ্চিত অনুমোদনের দাবি এবং OTP/PIN চাওয়া।",greenCardTitle:"🟢 নিরাপদ ঋণ",greenCardText:"ঋণদাতাকে যাচাই করুন এবং চুক্তি পড়ুন।",verifyTitle:"🏦 ঋণদাতা যাচাই করুন",verifyText:"সরকারি সূত্রে আইনি নাম ও অনুমোদন যাচাই করুন।",rbiLink:"সরকারি RBI ওয়েবসাইট ↗",sachetLink:"RBI Sachet পোর্টাল ↗",verifyNote:"এই অ্যাপ সরাসরি ঋণদাতাকে যাচাই করে না।",emiTitle:"🧮 EMI ও ঋণ খরচ ক্যালকুলেটর",emiText:"মাসিক কিস্তির আনুমানিক হিসাব করুন।",principalLabel:"ঋণের পরিমাণ (₹)",rateLabel:"বার্ষিক সুদ (%)",monthsLabel:"মেয়াদ (মাস)",processingLabel:"প্রসেসিং ফি (₹)",emiBtn:"EMI হিসাব করুন",monthlyEMI:"মাসিক EMI",totalInterest:"মোট সুদ",totalRepay:"মোট পরিশোধ",totalCost:"পরিশোধ + ফি",emiNote:"এটি আনুমানিক হিসাব; প্রকৃত পরিমাণ আলাদা হতে পারে।",stepsTitle:"🛡️ ঋণ নেওয়ার আগে",step1:"সরকারি সূত্রে যাচাই করুন।",step2:"চুক্তি ও সব ফি পড়ুন।",step3:"OTP, PIN বা পাসওয়ার্ড শেয়ার করবেন না।",step4:"সন্দেহজনক অগ্রিম ফি দেবেন না।",step5:"জালিয়াতির সন্দেহ হলে ব্যাঙ্কের সঙ্গে যোগাযোগ করুন।",footerText:"LoanShield AI · সচেতনতার জন্য; নিশ্চয়তা নয়।"
-},
-ta:{
-heroTitle:"கடன் பெறுவதற்கு முன் உங்களைப் பாதுகாத்துக் கொள்ளுங்கள்",heroText:"கடன் சலுகைகளைச் சரிபார்த்து எச்சரிக்கை அறிகுறிகளை அறியுங்கள்.",reviewTitle:"🔎 கடன் சலுகையைச் சரிபார்க்கவும்",companyLabel:"வங்கி / கடன் வழங்குநர் பெயர்",companyPH:"வங்கி அல்லது கடன் செயலியின் பெயரை உள்ளிடவும்",offerLabel:"கடன் சலுகை அல்லது செய்தி",offerPH:"செய்தியை உள்ளிடவும்; முதலில் தனிப்பட்ட விவரங்களை நீக்கவும்.",feeLabel:"கட்டணங்கள் தெளிவாக உள்ளனவா?",unknown:"தெரியவில்லை",feeYes:"ஆம், தெளிவாக உள்ளது",feeNo:"இல்லை, தெளிவற்றது",regLabel:"கடன் வழங்குநர் சரிபார்ப்பு",verified:"சுயமாகச் சரிபார்க்கப்பட்டது",unverified:"சரிபார்க்கப்படவில்லை / சந்தேகம்",advanceLabel:"கடனுக்கு முன் முன்பணம் கேட்கப்படுகிறதா?",no:"இல்லை",yes:"ஆம்",reviewBtn:"கடன் பாதுகாப்பைச் சரிபார்க்கவும்",privacyNote:"தகவல்கள் இந்தப் பக்கத்தில் மட்டுமே பயன்படுத்தப்படும்; சேமிக்கப்படாது. ரகசிய விவரங்களை உள்ளிட வேண்டாம்.",resultTitle:"ஆரம்பநிலை மதிப்பாய்வு",redTitle:"🚩 எச்சரிக்கை அறிகுறிகள்",greenTitle:"✅ பரிந்துரைக்கப்படும் நடவடிக்கைகள்",scoreDisclaimer:"இது ஆரம்பநிலைச் சரிபார்ப்பு மட்டுமே; உறுதிப்படுத்தப்பட்ட மோசடி கண்டறிதல் அல்ல.",shareBtn:"WhatsApp-ல் பகிரவும்",printBtn:"அச்சிடு / PDF சேமி",resetBtn:"படிவத்தை அழிக்கவும்",redCardTitle:"🚩 பொதுவான ஆபத்துகள்",redCardText:"முன்பணம், உறுதியான ஒப்புதல் வாக்குறுதிகள் மற்றும் OTP/PIN கேட்பது.",greenCardTitle:"🟢 பாதுகாப்பான கடன்",greenCardText:"கடன் வழங்குநரைச் சரிபார்த்து ஒப்பந்தத்தைப் படிக்கவும்.",verifyTitle:"🏦 கடன் வழங்குநரைச் சரிபார்க்கவும்",verifyText:"அதிகாரப்பூர்வ ஆதாரங்களில் சட்டப்பூர்வ பெயர் மற்றும் அனுமதியைச் சரிபார்க்கவும்.",rbiLink:"அதிகாரப்பூர்வ RBI இணையதளம் ↗",sachetLink:"RBI Sachet தளம் ↗",verifyNote:"இந்தச் செயலி கடன் வழங்குநரை நேரடியாகச் சரிபார்ப்பதில்லை.",emiTitle:"🧮 EMI மற்றும் கடன் செலவு கணிப்பான்",emiText:"மாதாந்திரத் தவணையை மதிப்பிடுங்கள்.",principalLabel:"கடன் தொகை (₹)",rateLabel:"ஆண்டு வட்டி (%)",monthsLabel:"காலம் (மாதங்கள்)",processingLabel:"செயலாக்கக் கட்டணம் (₹)",emiBtn:"EMI கணக்கிடவும்",monthlyEMI:"மாத EMI",totalInterest:"மொத்த வட்டி",totalRepay:"மொத்தத் திருப்பிச் செலுத்தல்",totalCost:"திருப்பிச் செலுத்தல் + கட்டணம்",emiNote:"இது மதிப்பீடு மட்டுமே; உண்மையான தொகை மாறலாம்.",stepsTitle:"🛡️ கடனை ஏற்கும் முன்",step1:"அதிகாரப்பூர்வ ஆதாரங்களில் சரிபார்க்கவும்.",step2:"ஒப்பந்தம் மற்றும் அனைத்து கட்டணங்களையும் படிக்கவும்.",step3:"OTP, PIN அல்லது கடவுச்சொல்லைப் பகிர வேண்டாம்.",step4:"சந்தேகத்திற்குரிய முன்பணம் செலுத்த வேண்டாம்.",step5:"மோசடி சந்தேகம் இருந்தால் வங்கியைத் தொடர்புகொள்ளவும்.",footerText:"LoanShield AI · விழிப்புணர்வுக்காக மட்டுமே; உத்தரவாதமல்ல."
-},
-te:{
-heroTitle:"రుణం తీసుకునే ముందు మిమ్మల్ని మీరు రక్షించుకోండి",heroText:"రుణ ఆఫర్లను పరిశీలించి హెచ్చరిక సంకేతాలను గుర్తించండి.",reviewTitle:"🔎 రుణ ఆఫర్‌ను పరిశీలించండి",companyLabel:"బ్యాంక్ / రుణదాత పేరు",companyPH:"బ్యాంక్ లేదా రుణ యాప్ పేరు నమోదు చేయండి",offerLabel:"రుణ ఆఫర్ లేదా సందేశం",offerPH:"సందేశాన్ని నమోదు చేయండి; ముందుగా వ్యక్తిగత వివరాలు తొలగించండి.",feeLabel:"ఫీజులు స్పష్టంగా ఉన్నాయా?",unknown:"తెలియదు",feeYes:"అవును, స్పష్టంగా ఉన్నాయి",feeNo:"కాదు, అస్పష్టంగా ఉన్నాయి",regLabel:"రుణదాత ధృవీకరణ",verified:"స్వతంత్రంగా ధృవీకరించారు",unverified:"ధృవీకరించలేదు / అనుమానాస్పదం",advanceLabel:"రుణానికి ముందు ముందస్తు చెల్లింపు అడుగుతున్నారా?",no:"కాదు",yes:"అవును",reviewBtn:"రుణ భద్రతను తనిఖీ చేయండి",privacyNote:"వివరాలు ఈ పేజీలో మాత్రమే ఉపయోగించబడతాయి; నిల్వ చేయబడవు. రహస్య వివరాలు ఇవ్వవద్దు.",resultTitle:"ప్రాథమిక సమీక్ష",redTitle:"🚩 హెచ్చరిక సంకేతాలు",greenTitle:"✅ సూచించిన చర్యలు",scoreDisclaimer:"ఇది ప్రాథమిక తనిఖీ మాత్రమే; నిర్ధారిత మోసం గుర్తింపు సాధనం కాదు.",shareBtn:"WhatsAppలో పంచుకోండి",printBtn:"ప్రింట్ / PDF సేవ్",resetBtn:"ఫారమ్ క్లియర్ చేయండి",redCardTitle:"🚩 సాధారణ ప్రమాదాలు",redCardText:"ముందస్తు ఫీజులు, ఖచ్చితమైన ఆమోద హామీలు, OTP/PIN అడగడం.",greenCardTitle:"🟢 సురక్షిత రుణం",greenCardText:"రుణదాతను ధృవీకరించి ఒప్పందాన్ని చదవండి.",verifyTitle:"🏦 రుణదాతను ధృవీకరించండి",verifyText:"అధికారిక వనరుల్లో చట్టపరమైన పేరు, అనుమతిని తనిఖీ చేయండి.",rbiLink:"అధికారిక RBI వెబ్‌సైట్ ↗",sachetLink:"RBI Sachet పోర్టల్ ↗",verifyNote:"ఈ యాప్ రుణదాతను నేరుగా ధృవీకరించదు.",emiTitle:"🧮 EMI మరియు రుణ ఖర్చు కాలిక్యులేటర్",emiText:"నెలవారీ చెల్లింపును అంచనా వేయండి.",principalLabel:"రుణ మొత్తం (₹)",rateLabel:"వార్షిక వడ్డీ (%)",monthsLabel:"కాలవ్యవధి (నెలలు)",processingLabel:"ప్రాసెసింగ్ ఫీజు (₹)",emiBtn:"EMI లెక్కించండి",monthlyEMI:"నెలవారీ EMI",totalInterest:"మొత్తం వడ్డీ",totalRepay:"మొత్తం తిరిగి చెల్లింపు",totalCost:"చెల్లింపు + ఫీజు",emiNote:"ఇది అంచనా మాత్రమే; అసలు మొత్తం మారవచ్చు.",stepsTitle:"🛡️ రుణం అంగీకరించే ముందు",step1:"అధికారిక వనరుల ద్వారా తనిఖీ చేయండి.",step2:"ఒప్పందం, అన్ని ఫీజులు చదవండి.",step3:"OTP, PIN లేదా పాస్‌వర్డ్ పంచుకోవద్దు.",step4:"అనుమానాస్పద ముందస్తు ఫీజులు చెల్లించవద్దు.",step5:"మోసం అనుమానం ఉంటే బ్యాంకును సంప్రదించండి.",footerText:"LoanShield AI · అవగాహన కోసం మాత్రమే; హామీ కాదు."
-},
-mr:{
-heroTitle:"कर्ज घेण्यापूर्वी स्वतःचे संरक्षण करा",heroText:"कर्जाच्या ऑफर तपासा आणि धोक्याची चिन्हे ओळखा.",reviewTitle:"🔎 कर्जाच्या ऑफरची तपासणी",companyLabel:"बँक / कर्जदात्याचे नाव",companyPH:"बँक किंवा कर्ज अॅपचे नाव लिहा",offerLabel:"कर्जाची ऑफर किंवा संदेश",offerPH:"संदेश टाका; आधी वैयक्तिक माहिती काढून टाका.",feeLabel:"शुल्क स्पष्ट आहे का?",unknown:"खात्री नाही",feeYes:"होय, स्पष्ट आहे",feeNo:"नाही, अस्पष्ट आहे",regLabel:"कर्जदात्याची पडताळणी",verified:"स्वतंत्रपणे पडताळले",unverified:"पडताळणी नाही / संशयास्पद",advanceLabel:"कर्जापूर्वी आगाऊ पैसे मागितले जात आहेत का?",no:"नाही",yes:"होय",reviewBtn:"कर्जाची सुरक्षितता तपासा",privacyNote:"माहिती या पेजवरच वापरली जाते; जतन केली जात नाही. गोपनीय माहिती टाकू नका.",resultTitle:"प्राथमिक तपासणी",redTitle:"🚩 धोक्याची चिन्हे",greenTitle:"✅ शिफारस केलेली पावले",scoreDisclaimer:"ही प्राथमिक तपासणी आहे; खात्रीशीर फसवणूक शोधणारे साधन नाही.",shareBtn:"WhatsApp वर शेअर करा",printBtn:"प्रिंट / PDF जतन करा",resetBtn:"फॉर्म साफ करा",redCardTitle:"🚩 सामान्य धोके",redCardText:"आगाऊ शुल्क, हमखास मंजुरीचे दावे आणि OTP/PIN मागणे.",greenCardTitle:"🟢 सुरक्षित कर्ज",greenCardText:"कर्जदात्याची स्वतंत्र पडताळणी करा आणि करार वाचा.",verifyTitle:"🏦 कर्जदात्याची पडताळणी",verifyText:"अधिकृत स्रोतांवर कायदेशीर नाव आणि परवानगी तपासा.",rbiLink:"अधिकृत RBI वेबसाइट ↗",sachetLink:"RBI Sachet पोर्टल ↗",verifyNote:"हे अॅप कर्जदात्याची थेट पडताळणी करत नाही.",emiTitle:"🧮 EMI आणि कर्ज खर्च कॅल्क्युलेटर",emiText:"मासिक हप्त्याचा अंदाज काढा.",principalLabel:"कर्जाची रक्कम (₹)",rateLabel:"वार्षिक व्याज (%)",monthsLabel:"कालावधी (महिने)",processingLabel:"प्रक्रिया शुल्क (₹)",emiBtn:"EMI मोजा",monthlyEMI:"मासिक EMI",totalInterest:"एकूण व्याज",totalRepay:"एकूण परतफेड",totalCost:"परतफेड + शुल्क",emiNote:"हा अंदाज आहे; प्रत्यक्ष रक्कम वेगळी असू शकते.",stepsTitle:"🛡️ कर्ज स्वीकारण्यापूर्वी",step1:"अधिकृत स्रोतांवर पडताळणी करा.",step2:"करार आणि सर्व शुल्क वाचा.",step3:"OTP, PIN किंवा पासवर्ड शेअर करू नका.",step4:"संशयास्पद आगाऊ शुल्क भरू नका.",step5:"फसवणुकीचा संशय असल्यास बँकेशी संपर्क साधा.",footerText:"LoanShield AI · जनजागृतीसाठी; हमी नाही."
+hi: {
+subtitle:"लोन एग्रीमेंट PDF जाँच",
+languageLabel:"भाषा / Language",
+uploadHeading:"अपने लोन एग्रीमेंट की जाँच करें",
+intro:"टेक्स्ट वाले लोन एग्रीमेंट की PDF अपलोड करें। यह टूल टेक्स्ट निकालकर संभावित जोखिम वाले शब्दों की जाँच करेगा।",
+fileLabel:"लोन एग्रीमेंट PDF चुनें",
+analyzeBtn:"PDF निकालें और जाँचें",
+clearBtn:"साफ करें",
+privacyNotice:"<strong>गोपनीयता:</strong> PDF का टेक्स्ट आपके ब्राउज़र में प्रोसेस होता है। PDF.js CDN से लोड होता है, इसलिए इंटरनेट चाहिए। आपका दस्तावेज़ किसी AI सेवा को नहीं भेजा जाता।",
+resultsHeading:"जाँच के परिणाम",
+downloadBtn:"टेक्स्ट रिपोर्ट डाउनलोड करें",
+textBtn:"निकाला गया टेक्स्ट देखें",
+extractedHeading:"PDF से निकाला गया टेक्स्ट",
+limitsHeading:"महत्वपूर्ण जानकारी",
+empty:"पहले PDF फ़ाइल चुनें।",
+pdfOnly:"कृपया सही PDF फ़ाइल चुनें।",
+working:"PDF पढ़ी जा रही है और टेक्स्ट की जाँच हो रही है...",
+done:"जाँच पूरी हुई।",
+failed:"PDF नहीं पढ़ी जा सकी। फ़ाइल खराब, पासवर्ड-सुरक्षित या केवल इमेज वाली हो सकती है।",
+noText:"चुनने योग्य टेक्स्ट नहीं मिला। PDF स्कैन की हुई हो सकती है। OCR सुविधा शामिल नहीं है।",
+pages:"पेज",
+words:"निकाले गए शब्द",
+findings:"जाँचने योग्य संभावित बिंदु",
+none:"चेतावनी वाले खोज-शब्द नहीं मिले। इसका अर्थ यह नहीं कि एग्रीमेंट सुरक्षित है।",
+disclaimer:"यह केवल शुरुआती शब्द-आधारित जाँच है। यह कानूनी सलाह, धोखाधड़ी की पुष्टि या अंतिम जोखिम आकलन नहीं है।",
+downloadReady:"टेक्स्ट रिपोर्ट डाउनलोड हो गई।",
+show:"निकाला गया टेक्स्ट देखें",
+hide:"टेक्स्ट छिपाएँ",
+limits:[
+"यह टूल सामान्य शब्दों की जाँच करता है, कानूनी समीक्षा या धोखाधड़ी की अंतिम पुष्टि नहीं।",
+"यह पुष्टि नहीं कर सकता कि ऋणदाता या एग्रीमेंट असली है या नहीं।",
+"स्कैन की हुई PDF में टेक्स्ट नहीं मिल सकता; OCR शामिल नहीं है।",
+"ऋणदाता, ब्याज दर, शुल्क, जुर्माना और भुगतान की शर्तें स्वतंत्र रूप से जाँचें।"
+],
+checks:[
+["ब्याज दर या APR","high interest|very high interest|excessive interest|annual percentage rate|APR"],
+["देरी शुल्क या जुर्माना","late fee|late payment|penalty|penalties|default charge"],
+["पहले भुगतान या फोरक्लोज़र शुल्क","prepayment charge|prepayment penalty|foreclosure charge|early repayment fee"],
+["गिरवी या सुरक्षा","collateral|security interest|secured loan|pledge|hypothecation"],
+["बदलती ब्याज दर","floating interest|variable interest|rate may change|change in interest rate"],
+["ऑटो-डेबिट या बैंक मैंडेट","automatic debit|auto debit|direct debit|bank mandate|NACH mandate"],
+["विवाद या मध्यस्थता की शर्तें","arbitration|dispute resolution|jurisdiction|governing law"],
+["डिफॉल्ट की शर्तें","event of default|acceleration clause|entire balance due|default interest"],
+["अतिरिक्त शुल्क","processing fee|administrative fee|hidden charges|additional charges"],
+["व्यक्तिगत गारंटी","personal guarantee|personal guarantor|guarantor liability"]
+]
 }
 };
 
-const en=messages.en;
-let lang="en",lastReport=null;
-function t(k){return (messages[lang]&&messages[lang][k])||en[k]||k}
-function setLanguage(value){
- lang=messages[value]?value:"en";
- try{localStorage.setItem(LANG_KEY,lang)}catch(e){}
- document.documentElement.lang=lang;
- document.documentElement.dir=lang==="ur"?"rtl":"ltr";
- $("languageSelect").value=lang;
- document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i)});
- document.querySelectorAll("[data-ph]").forEach(el=>{el.placeholder=t(el.dataset.ph)});
- $("themeBtn").title=lang==="hi"?"डार्क मोड बदलें":lang==="ur"?"ڈارک موڈ تبدیل کریں":"Toggle dark mode";
- if(lastReport)renderReport();
+let currentLang = "en";
+let reportText = "";
+let extracted = "";
+
+function setLanguage() {
+  currentLang = document.getElementById("language").value;
+  const t = TX[currentLang];
+  document.documentElement.lang = currentLang;
+  [
+    "subtitle","languageLabel","uploadHeading","intro","fileLabel",
+    "analyzeBtn","clearBtn","resultsHeading","downloadBtn",
+    "extractedHeading","limitsHeading"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && t[id]) el.textContent = t[id];
+  });
+  document.getElementById("privacyNotice").innerHTML = t.privacyNotice;
+  document.getElementById("textBtn").textContent = t.textBtn;
+  document.getElementById("limits").innerHTML =
+    t.limits.map(x => "<li>" + escapeHtml(x) + "</li>").join("");
+  document.getElementById("status").textContent = "";
 }
-function setTheme(dark){
- document.body.classList.toggle("dark",dark);
- $("themeBtn").textContent=dark?"☀️":"🌙";
- $("themeBtn").setAttribute("aria-label",dark?"Light mode":"Dark mode");
- try{localStorage.setItem(THEME_KEY,dark?"dark":"light")}catch(e){}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
 }
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function addItem(list,text){const li=document.createElement("li");li.textContent=text;list.appendChild(li)}
-function review(){
- const company=$("company").value.trim(),offer=$("offer").value.trim();
- if(!company&&!offer){alert(t("enter"));$("company").focus();return}
- let risk=0,red=[],actions=[t("actionVerify"),t("actionNoOTP"),t("actionTerms")];
- const fees=$("fees").value,lender=$("lender").value,advance=$("advance").value;
- if(lender==="unverified"){risk+=35;red.push(t("lenderUnverified"))}
- else if(lender==="unknown"){risk+=15;red.push(t("lenderUnknown"))}
- else red.push(t("lenderVerified"));
- if(fees==="no"){risk+=25;red.push(t("feesBad"))}
- else if(fees==="unknown"){risk+=10;red.push(t("feesUnknown"))}
- else red.push(t("feesGood"));
- if(advance==="yes"){risk+=35;red.push(t("advanceBad"));actions.unshift(t("actionFee"))}
- else if(advance==="unknown"){risk+=10;red.push(t("advanceUnknown"))}
- else red.push(t("advanceGood"));
- const text=offer.toLowerCase();
- const patterns=[
-  {re:/\b(otp|one.time.password|pin|upi pin|bank password)\b/i,points:25},
-  {re:/guaranteed approval|100% approval|no verification|instant guaranteed/i,points:15},
-  {re:/pay first|pay upfront|advance fee|release fee|unlock loan|processing fee before loan|security deposit/i,points:20},
-  {re:/urgent|immediately|today only|act now|limited time/i,points:10},
-  {re:/remote access|screen sharing|install anydesk|install teamviewer/i,points:25}
- ];
- let matched=false;
- patterns.forEach(p=>{if(p.re.test(offer)){risk+=p.points;matched=true}});
- if(matched)red.push(t("keyword"));
- if(!offer)red.push(t("enter"));
- risk=Math.min(100,risk);
- const score=100-risk;
- const level=risk>=60?t("high"):risk>=30?t("medium"):t("low");
- lastReport={company,score,risk,level,red,actions,offer};
- renderReport();
- $("result").classList.remove("hidden");
- $("result").scrollIntoView({behavior:"smooth",block:"start"});
+
+function countWords(text) {
+  const matches = text.trim().match(/\S+/g);
+  return matches ? matches.length : 0;
 }
-function renderReport(){
- if(!lastReport)return;
- $("riskBadge").textContent=lastReport.level;
- $("score").textContent=lastReport.score+"/100";
- $("scoreText").textContent=t("scoreLabel");
- $("redList").replaceChildren();
- $("greenList").replaceChildren();
- if(lastReport.risk===0)addItem($("redList"),t("noRisk"));
- lastReport.red.forEach(s=>addItem($("redList"),s));
- [...new Set(lastReport.actions)].forEach(s=>addItem($("greenList"),s));
+
+async function analyzeLoanPDF() {
+  const t = TX[currentLang];
+  const file = document.getElementById("loanPdf").files[0];
+  const status = document.getElementById("status");
+  const btn = document.getElementById("analyzeBtn");
+  document.getElementById("resultsCard").classList.add("hidden");
+  document.getElementById("extractedWrap").classList.add("hidden");
+
+  if (!file) {
+    status.textContent = t.empty;
+    return;
+  }
+  if (!file.name.toLowerCase().endsWith(".pdf") &&
+      file.type !== "application/pdf") {
+    status.textContent = t.pdfOnly;
+    return;
+  }
+  if (!window.pdfjsLib) {
+    status.textContent = "PDF.js could not load. Check your internet connection and refresh the page.";
+    return;
+  }
+
+  btn.disabled = true;
+  status.textContent = t.working;
+
+  try {
+    const buffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: buffer}).promise;
+    const pageTexts = [];
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      status.textContent = t.working + " (" + i + "/" + pdf.numPages + ")";
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const line = content.items.map(item => item.str).join(" ");
+      pageTexts.push("---- Page " + i + " ----\n" + line);
+    }
+
+    extracted = pageTexts.join("\n\n").trim();
+    if (!extracted.replace(/---- Page \d+ ----/g, "").trim()) {
+      throw new Error("NO_TEXT");
+    }
+
+    const findings = [];
+    const searchable = extracted.toLowerCase();
+
+    for (const [name, terms] of t.checks) {
+      const matches = terms.split("|").filter(term =>
+        searchable.includes(term.toLowerCase())
+      );
+      if (matches.length) {
+        findings.push({name, matches});
+      }
+    }
+
+    let html = "";
+    html += '<div class="result good"><strong>' +
+      escapeHtml(t.pages) + ":</strong> " + pdf.numPages +
+      " &nbsp; <strong>" + escapeHtml(t.words) + ":</strong> " +
+      countWords(extracted) + "</div>";
+
+    html += '<h3>' + escapeHtml(t.findings) + "</h3>";
+
+    if (!findings.length) {
+      html += '<div class="result good">' + escapeHtml(t.none) + "</div>";
+    } else {
+      findings.forEach(item => {
+        html += '<div class="result warning"><strong>' +
+          escapeHtml(item.name) + "</strong><br>" +
+          "Matched terms: " +
+          item.matches.map(escapeHtml).join(", ") +
+          "<br>Review the relevant clause in the original agreement.</div>";
+      });
+    }
+
+    html += '<div class="result danger">' +
+      escapeHtml(t.disclaimer) + "</div>";
+
+    document.getElementById("summary").innerHTML =
+      '<p><strong>' + escapeHtml(file.name) + "</strong></p>";
+    document.getElementById("findings").innerHTML = html;
+    document.getElementById("extractedText").value = extracted;
+    document.getElementById("resultsCard").classList.remove("hidden");
+
+    reportText =
+      "LoanShield AI - Preliminary PDF Text Check\n" +
+      "File: " + file.name + "\n" +
+      "Pages: " + pdf.numPages + "\n" +
+      "Words: " + countWords(extracted) + "\n\n" +
+      t.disclaimer + "\n\n" +
+      "Findings:\n" +
+      (findings.length
+        ? findings.map(f => f.name + ": " + f.matches.join(", ")).join("\n")
+        : t.none) +
+      "\n\nEXTRACTED TEXT\n\n" + extracted;
+
+    status.textContent = t.done;
+    document.getElementById("resultsCard").scrollIntoView({behavior:"smooth"});
+  } catch (err) {
+    console.error(err);
+    status.textContent = err.message === "NO_TEXT" ? t.noText : t.failed;
+  } finally {
+    btn.disabled = false;
+  }
 }
-function calcEMI(){
- const p=Number($("principal").value),annual=Number($("rate").value),n=Number($("months").value),fee=Number($("processing").value);
- if(!Number.isFinite(p)||!Number.isFinite(annual)||!Number.isFinite(n)||!Number.isFinite(fee)||p<=0||annual<0||annual>100||n<1||n>600||!Number.isInteger(n)||fee<0||p>1e11||fee>1e8){
-  alert(t("invalid"));return;
- }
- const r=annual/1200;
- const emi=r===0?p/n:p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
- const interest=emi*n-p,total=emi*n;
- const fmt=v=>new Intl.NumberFormat(lang==="en"?"en-IN":lang,{style:"currency",currency:"INR",maximumFractionDigits:2}).format(v);
- $("emiValue").textContent=fmt(emi);
- $("interestValue").textContent=fmt(interest);
- $("repayValue").textContent=fmt(total);
- $("costValue").textContent=fmt(total+fee);
- $("emiResult").classList.remove("hidden");
+
+function toggleExtracted() {
+  const wrap = document.getElementById("extractedWrap");
+  const t = TX[currentLang];
+  wrap.classList.toggle("hidden");
+  document.getElementById("textBtn").textContent =
+    wrap.classList.contains("hidden") ? t.show : t.hide;
 }
-function reportText(){
- if(!lastReport)return t("whatsTitle");
- return [t("whatsTitle"),t("companyLabel")+": "+(lastReport.company||"—"),t("scoreLabel")+": "+lastReport.score+"/100",...lastReport.red,t("reportDisclaimer"),t("footerText")].join("\n");
+
+function downloadReport() {
+  if (!reportText) return;
+  const blob = new Blob([reportText], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "LoanShield_Report.txt";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
-function share(){
- const msg=reportText();
- window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank","noopener,noreferrer");
+
+function clearResults() {
+  document.getElementById("loanPdf").value = "";
+  document.getElementById("status").textContent = "";
+  document.getElementById("resultsCard").classList.add("hidden");
+  document.getElementById("extractedWrap").classList.add("hidden");
+  document.getElementById("summary").innerHTML = "";
+  document.getElementById("findings").innerHTML = "";
+  document.getElementById("extractedText").value = "";
+  reportText = "";
+  extracted = "";
 }
-function clearForm(){
- ["company","offer"].forEach(id=>$(id).value="");
- $("fees").value="unknown";$("lender").value="unknown";$("advance").value="unknown";
- $("result").classList.add("hidden");lastReport=null;$("company").focus();
-}
-$("languageSelect").addEventListener("change",e=>setLanguage(e.target.value));
-$("themeBtn").addEventListener("click",()=>setTheme(!document.body.classList.contains("dark")));
-$("reviewBtn").addEventListener("click",review);
-$("emiBtn").addEventListener("click",calcEMI);
-$("shareBtn").addEventListener("click",share);
-$("printBtn").addEventListener("click",()=>window.print());
-$("resetBtn").addEventListener("click",clearForm);
-try{
- const saved=localStorage.getItem(LANG_KEY);
- if(saved&&messages[saved])lang=saved;
- setTheme(localStorage.getItem(THEME_KEY)==="dark");
-}catch(e){setTheme(false)}
-setLanguage(lang);
+
+setLanguage();
 </script>
 </body>
 </html>
