@@ -1,376 +1,395 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#102a43">
-<title>LoanShield AI - Loan Agreement Checker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LoanShield AI — Loan Safety Checker</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-:root{--navy:#102a43;--blue:#1769aa;--bg:#f2f6fb;--green:#13795b;--red:#b42318}
+:root{--bg:#f2f6fc;--card:#fff;--text:#172033;--muted:#64748b;--primary:#155eef;--border:#dbe4f0}
+body.dark{--bg:#101827;--card:#1d2939;--text:#f2f4f7;--muted:#b5c0d0;--border:#344054}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#243447}
-header{background:var(--navy);color:white;padding:24px 16px;text-align:center}
-header h1{margin:0 0 8px;font-size:28px}
-header p{margin:0;color:#d9e8f5}
-main{max-width:850px;margin:24px auto;padding:0 14px}
-.card{background:white;border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 3px 15px #18334d12}
-h2{margin-top:0;color:var(--navy);font-size:21px}
-label{display:block;font-weight:bold;margin:14px 0 8px}
-input,select,textarea{width:100%;padding:12px;border:1px solid #ccd6e0;border-radius:8px;font-size:16px;background:white}
-button{border:0;border-radius:8px;padding:13px 17px;background:var(--blue);color:white;font-weight:bold;font-size:16px;cursor:pointer}
-button:disabled{opacity:.55;cursor:wait}
-button.secondary{background:#e8eef5;color:var(--navy)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
-.notice{background:#edf6ff;padding:12px;border-radius:8px;line-height:1.5;font-size:14px}
-.status{margin-top:12px;font-weight:bold;overflow-wrap:anywhere}
-.result{border-left:4px solid var(--blue);background:#f7faff;padding:13px;margin:10px 0;border-radius:5px;line-height:1.55}
-.result.warning{border-color:#d97706}
-.result.danger{border-color:var(--red)}
-.result.good{border-color:var(--green)}
-.tag{display:inline-block;background:#e8eef5;padding:4px 8px;border-radius:6px;font-size:13px;margin:3px}
-footer{text-align:center;padding:22px;color:#607080;font-size:13px}
-.hidden{display:none}
-pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font:16px Arial,sans-serif;line-height:1.6}
+header{background:#102a56;color:white;padding:15px}
+.top{max-width:900px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{font-size:22px;font-weight:bold}
+.brand span{color:#69b1ff}
+select,button,input,textarea{font:inherit;padding:11px;border-radius:8px;border:1px solid var(--border)}
+main{max-width:900px;margin:22px auto;padding:0 14px}
+.hero,.card{background:var(--card);padding:22px;border-radius:15px;margin-bottom:18px;border:1px solid var(--border)}
+h1{font-size:28px;margin:0 0 8px}
+h2{font-size:21px;margin-top:0}
+h3{font-size:17px}
+p,.muted{color:var(--muted)}
+label{display:block;font-weight:bold;margin:13px 0 5px}
+input,textarea,select{width:100%;background:var(--card);color:var(--text)}
+textarea{min-height:100px;resize:vertical}
+button{cursor:pointer;background:var(--primary);color:white;border:0;font-weight:bold;margin:5px 4px 5px 0}
+button.secondary{background:#475467}
+button.green{background:#12805c}
+button.warning{background:#b54708}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.tile{border:1px solid var(--border);border-radius:10px;padding:14px;overflow-wrap:anywhere}
+.big{font-size:30px;font-weight:bold}
+.notice{padding:14px;border-radius:9px;background:#fff4d6;color:#693c00;margin:14px 0}
+body.dark .notice{background:#493514;color:#ffedb0}
+.good{color:#12805c;font-weight:bold}
+.bad{color:#c43232;font-weight:bold}
+#results{display:none}
+#pdfText{white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto;font-size:13px}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+.small{font-size:13px}
+.check{display:flex;gap:10px;align-items:flex-start;margin:12px 0}
+.check input{width:auto;margin-top:6px}
+.check label{margin:0;font-weight:normal}
+hr{border:0;border-top:1px solid var(--border);margin:18px 0}
 </style>
 </head>
 <body>
 <header>
-<h1>🛡️ LoanShield AI</h1>
-<p id="subtitle">Loan Agreement PDF Checker</p>
-</header>
-
-<main>
-<section class="card">
-<label for="language" id="languageLabel">Language / भाषा</label>
-<select id="language" onchange="setLanguage()">
+<div class="top">
+<div class="brand">🛡️ LoanShield <span>AI</span></div>
+<div style="display:flex;gap:7px;align-items:center">
+<select id="language" aria-label="Language" style="width:auto" onchange="setLanguage(this.value)">
 <option value="en">English</option>
 <option value="hi">हिन्दी</option>
 </select>
-
-<h2 id="uploadHeading">Check Your Loan Agreement</h2>
-<p id="intro">Upload a text-based loan agreement PDF to extract its text and check for potentially concerning terms.</p>
-
-<label for="loanPdf" id="fileLabel">Choose loan agreement PDF</label>
-<input type="file" id="loanPdf" accept=".pdf,application/pdf">
-
-<div class="actions">
-<button id="analyzeBtn" onclick="analyzeLoanPDF()">Extract &amp; Analyze PDF</button>
-<button class="secondary" id="clearBtn" onclick="clearResults()">Clear</button>
+<button class="secondary" onclick="document.body.classList.toggle('dark')">🌙</button>
 </div>
-
-<div class="status" id="status" role="status" aria-live="polite"></div>
-
-<div class="notice" style="margin-top:16px" id="privacyNotice">
-<strong>Privacy:</strong> PDF text is processed in your browser. PDF.js is loaded from a CDN, so an internet connection is required. This tool does not send your document to an AI service.
 </div>
+</header>
+
+<main>
+<section class="hero">
+<h1 id="heroTitle">Protect Yourself Before Taking a Loan</h1>
+<p id="heroText">Review loan offers, identify warning signs, and understand estimated repayment costs.</p>
 </section>
 
-<section class="card hidden" id="resultsCard">
-<h2 id="resultsHeading">Analysis Results</h2>
-<div id="summary"></div>
-<div id="findings"></div>
-<div class="actions">
-<button onclick="downloadReport()" id="downloadBtn">Download Text Report</button>
-<button class="secondary" onclick="toggleExtracted()" id="textBtn">Show Extracted Text</button>
+<section class="card">
+<h2 id="manualTitle">🔎 Check a Loan Offer</h2>
+<label id="lenderLabel" for="lender">Bank / Lender Name</label>
+<input id="lender" placeholder="Enter bank or loan app name">
+
+<label id="offerLabel" for="offer">Loan Offer Details</label>
+<textarea id="offer" placeholder="Paste loan terms here. Never enter passwords, OTPs or account credentials."></textarea>
+
+<label id="feeLabel" for="fees">Are all fees clearly disclosed?</label>
+<select id="fees">
+<option value="unknown">Not sure</option>
+<option value="yes">Yes, clearly disclosed</option>
+<option value="no">No, unclear or hidden</option>
+</select>
+
+<label id="verifiedLabel" for="verified">Have you verified the lender independently?</label>
+<select id="verified">
+<option value="unknown">Not verified</option>
+<option value="yes">Verified using official sources</option>
+<option value="no">Could not verify / suspicious</option>
+</select>
+
+<label id="advanceLabel" for="advance">Is advance payment demanded before loan disbursal?</label>
+<select id="advance">
+<option value="unknown">Not sure</option>
+<option value="no">No</option>
+<option value="yes">Yes</option>
+</select>
+
+<button id="checkBtn" onclick="checkOffer()">Check Loan Safety</button>
+<button class="secondary" onclick="clearForm()">Clear</button>
+<div id="manualResult" aria-live="polite"></div>
+</section>
+
+<section class="card">
+<h2 id="pdfTitle">📄 Upload Loan Agreement PDF</h2>
+<p id="pdfHelp">Text-based PDFs are processed in your browser. Your PDF is not sent to our server.</p>
+<input type="file" id="pdfFile" accept=".pdf,application/pdf">
+<button id="analyzeBtn" onclick="analyzePDF()">Extract & Analyze PDF</button>
+<p id="pdfStatus" aria-live="polite"></p>
+<div id="pdfResults" style="display:none">
+<h3 id="detailsTitle">Extracted Details</h3>
+<div class="grid">
+<div class="tile"><div id="amountLabel">Loan Amount</div><div class="big" id="amountValue">Not detected</div></div>
+<div class="tile"><div id="rateLabel">Annual Interest</div><div class="big" id="rateValue">Not detected</div></div>
+<div class="tile"><div id="emiLabel">Monthly EMI</div><div class="big" id="emiValue">Not detected</div></div>
+<div class="tile"><div id="tenureLabel">Tenure</div><div class="big" id="tenureValue">Not detected</div></div>
 </div>
-<div id="extractedWrap" class="hidden">
-<h2 id="extractedHeading" style="margin-top:20px">Extracted PDF Text</h2>
-<textarea id="extractedText" rows="12" readonly></textarea>
+<div id="enhancedReview"></div>
+<h3 id="previewTitle">Extracted Text Preview</h3>
+<div class="tile" id="pdfText"></div>
 </div>
 </section>
 
 <section class="card">
-<h2 id="limitsHeading">Important Information</h2>
-<ul id="limits">
-<li>This tool performs basic keyword checks, not a legal review or definitive fraud detection.</li>
-<li>It cannot confirm whether a lender or agreement is genuine.</li>
-<li>Scanned/image-only PDFs may not contain extractable text; OCR is not included.</li>
-<li>Always verify the lender, interest rate, fees, penalties and repayment terms independently.</li>
-</ul>
+<h2 id="costTitle">🧮 Estimate Loan Repayment</h2>
+<p id="costHelp">Enter the figures from the lender's official repayment schedule.</p>
+<div class="grid">
+<div><label id="principalLabel" for="principal">Loan Principal (₹)</label><input type="number" id="principal" min="0" placeholder="500000"></div>
+<div><label id="interestLabel" for="interest">Annual Interest Rate (%)</label><input type="number" id="interest" min="0" max="100" step="0.01" placeholder="12"></div>
+<div><label id="monthsLabel" for="months">Tenure (months)</label><input type="number" id="months" min="1" max="600" placeholder="60"></div>
+</div>
+<button onclick="calculateLoan()" id="calculateBtn">Calculate Estimated Cost</button>
+<div id="costResult" aria-live="polite"></div>
+</section>
+
+<section class="card">
+<h2 id="disclaimerTitle">⚠️ Financial & Legal Disclaimer</h2>
+<div class="notice">
+<strong id="disclaimerHeading">Important Notice</strong>
+<p id="disclaimerText">LoanShield AI provides preliminary automated checks for informational and educational purposes only. Risk scores, extracted information and repayment estimates may be incomplete or inaccurate. This tool does not provide financial or legal advice and cannot guarantee that a lender or loan agreement is safe, genuine or legally compliant.</p>
+<p><strong id="advisorText">Please consult a qualified financial or legal advisor before signing any loan agreement or making any financial decision.</strong></p>
+<p id="verifyText">Independently verify the lender, interest rate, fees, penalties and repayment obligations. Always review the original agreement and official repayment schedule.</p>
+</div>
+<p class="small" id="privacyText">Privacy: PDF text is processed locally in your browser. The PDF.js library is loaded from a third-party CDN. This tool does not upload your PDF to a LoanShield server.</p>
+</section>
+
+<section class="card">
+<h2 id="reportTitle">📋 Your Report</h2>
+<button class="green" onclick="downloadReport()" id="downloadBtn">Download Report (.txt)</button>
+<button class="secondary" onclick="shareWhatsApp()" id="shareBtn">Share Summary on WhatsApp</button>
+<p class="small" id="reportHelp">Review all detected details against the original loan documents before relying on them.</p>
 </section>
 </main>
-
-<footer>LoanShield AI · Preliminary document screening tool</footer>
+<footer>© <span id="year"></span> LoanShield AI · Preliminary information only · Not financial or legal advice</footer>
 
 <script>
-if (window.pdfjsLib) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+if(window.pdfjsLib){
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 }
 
-const TX = {
-en: {
-subtitle:"Loan Agreement PDF Checker",
-languageLabel:"Language / भाषा",
-uploadHeading:"Check Your Loan Agreement",
-intro:"Upload a text-based loan agreement PDF to extract its text and check for potentially concerning terms.",
-fileLabel:"Choose loan agreement PDF",
-analyzeBtn:"Extract & Analyze PDF",
-clearBtn:"Clear",
-privacyNotice:"<strong>Privacy:</strong> PDF text is processed in your browser. PDF.js is loaded from a CDN, so an internet connection is required. This tool does not send your document to an AI service.",
-resultsHeading:"Analysis Results",
-downloadBtn:"Download Text Report",
-textBtn:"Show Extracted Text",
-extractedHeading:"Extracted PDF Text",
-limitsHeading:"Important Information",
-empty:"Please select a PDF file first.",
-pdfOnly:"Please select a valid PDF file.",
-working:"Reading PDF and checking its text...",
-done:"Analysis complete.",
-failed:"Could not read this PDF. It may be damaged, encrypted, or image-only.",
-noText:"No selectable text was found. This may be a scanned PDF. OCR is not included.",
-pages:"Pages",
-words:"Words extracted",
-findings:"Potential points to review",
-none:"No matching warning keywords were found. This does not mean the agreement is safe.",
-disclaimer:"This is a preliminary keyword check, not legal advice, fraud verification, or a definitive risk assessment.",
-downloadReady:"Text report downloaded.",
-show:"Show Extracted Text",
-hide:"Hide Extracted Text",
-limits:[
-"This tool performs basic keyword checks, not a legal review or definitive fraud detection.",
-"It cannot confirm whether a lender or agreement is genuine.",
-"Scanned/image-only PDFs may not contain extractable text; OCR is not included.",
-"Always verify the lender, interest rate, fees, penalties and repayment terms independently."
-],
-checks:[
-["High interest or APR","high interest|very high interest|excessive interest|annual percentage rate|APR"],
-["Late fees or penalties","late fee|late payment|penalty|penalties|default charge"],
-["Prepayment or foreclosure charges","prepayment charge|prepayment penalty|foreclosure charge|early repayment fee"],
-["Collateral or security","collateral|security interest|secured loan|pledge|hypothecation"],
-["Variable interest rate","floating interest|variable interest|rate may change|change in interest rate"],
-["Automatic debit or mandate","automatic debit|auto debit|direct debit|bank mandate|NACH mandate"],
-["Arbitration or dispute terms","arbitration|dispute resolution|jurisdiction|governing law"],
-["Default or acceleration terms","event of default|acceleration clause|entire balance due|default interest"],
-["Additional charges or fees","processing fee|administrative fee|hidden charges|additional charges"],
-["Personal guarantee","personal guarantee|personal guarantor|guarantor liability"]
-]
+const T={
+en:{
+heroTitle:"Protect Yourself Before Taking a Loan",
+heroText:"Review loan offers, identify warning signs, and understand estimated repayment costs.",
+manualTitle:"🔎 Check a Loan Offer",lenderLabel:"Bank / Lender Name",
+offerLabel:"Loan Offer Details",fees:"Are all fees clearly disclosed?",
+verified:"Have you verified the lender independently?",advance:"Is advance payment demanded before loan disbursal?",
+checkBtn:"Check Loan Safety",pdfTitle:"📄 Upload Loan Agreement PDF",
+pdfHelp:"Text-based PDFs are processed in your browser. Your PDF is not sent to our server.",
+analyzeBtn:"Extract & Analyze PDF",detailsTitle:"Extracted Details",amountLabel:"Loan Amount",
+rateLabel:"Annual Interest",emiLabel:"Monthly EMI",tenureLabel:"Tenure",
+previewTitle:"Extracted Text Preview",costTitle:"🧮 Estimate Loan Repayment",
+costHelp:"Enter the figures from the lender's official repayment schedule.",
+principalLabel:"Loan Principal (₹)",interestLabel:"Annual Interest Rate (%)",
+monthsLabel:"Tenure (months)",calculateBtn:"Calculate Estimated Cost",
+disclaimerTitle:"⚠️ Financial & Legal Disclaimer",disclaimerHeading:"Important Notice",
+disclaimerText:"LoanShield AI provides preliminary automated checks for informational and educational purposes only. Risk scores, extracted information and repayment estimates may be incomplete or inaccurate. This tool does not provide financial or legal advice and cannot guarantee that a lender or loan agreement is safe, genuine or legally compliant.",
+advisorText:"Please consult a qualified financial or legal advisor before signing any loan agreement or making any financial decision.",
+verifyText:"Independently verify the lender, interest rate, fees, penalties and repayment obligations. Always review the original agreement and official repayment schedule.",
+privacyText:"Privacy: PDF text is processed locally in your browser. The PDF.js library is loaded from a third-party CDN. This tool does not upload your PDF to a LoanShield server.",
+reportTitle:"📋 Your Report",downloadBtn:"Download Report (.txt)",
+shareBtn:"Share Summary on WhatsApp",reportHelp:"Review all detected details against the original loan documents before relying on them.",
+needPDF:"Please choose a PDF file first.",reading:"Reading PDF locally…",
+readDone:"PDF text extracted. Check the details carefully against the original agreement.",
+pdfError:"Could not read this PDF. Try a valid, unencrypted text-based PDF.",
+scanned:"No selectable text was found. This may be a scanned PDF; OCR is not included.",
+notFound:"Not detected",riskTitle:"Preliminary Warning Score",
+costEstimate:"Estimated Repayment",totalPaid:"Estimated Total Repayment",
+interestPaid:"Estimated Interest",riskNote:"This score counts warning-related wording. It is not the probability of fraud and does not certify safety.",
+manualWarn:"Warning signs found. Verify the lender and all terms independently.",
+manualOk:"No selected warning signs were reported. This does not guarantee the loan is safe.",
+advanceWarn:"Advance-payment demand detected. Do not pay until you independently verify the lender and the demand.",
+noAdvance:"No advance-payment wording was detected by this basic scan. That does not prove safety.",
+consult:"Consult a qualified financial or legal advisor before making a decision.",
+badInput:"Please enter a valid principal, interest rate and tenure.",
+amount:"Loan amount",rate:"Interest rate",emi:"EMI",months:"months",
+flagFee:"Unclear or hidden fees",flagAdvance:"Advance-payment demand",
+flagUrgency:"Urgency or pressure tactics",flagGuarantee:"Guaranteed approval claims",
+flagPenalty:"Late-payment or default charges",flagVariable:"Variable interest rate",
+flagSensitive:"Requests for sensitive information",flagOther:"Other suspicious wording",
+principal:"Principal",rateShort:"Annual rate",tenure:"Tenure",
+costCaveat:"This is a mathematical estimate, not a lender quote. Actual charges, taxes, insurance and fees may change the total."
 },
-hi: {
-subtitle:"लोन एग्रीमेंट PDF जाँच",
-languageLabel:"भाषा / Language",
-uploadHeading:"अपने लोन एग्रीमेंट की जाँच करें",
-intro:"टेक्स्ट वाले लोन एग्रीमेंट की PDF अपलोड करें। यह टूल टेक्स्ट निकालकर संभावित जोखिम वाले शब्दों की जाँच करेगा।",
-fileLabel:"लोन एग्रीमेंट PDF चुनें",
-analyzeBtn:"PDF निकालें और जाँचें",
-clearBtn:"साफ करें",
-privacyNotice:"<strong>गोपनीयता:</strong> PDF का टेक्स्ट आपके ब्राउज़र में प्रोसेस होता है। PDF.js CDN से लोड होता है, इसलिए इंटरनेट चाहिए। आपका दस्तावेज़ किसी AI सेवा को नहीं भेजा जाता।",
-resultsHeading:"जाँच के परिणाम",
-downloadBtn:"टेक्स्ट रिपोर्ट डाउनलोड करें",
-textBtn:"निकाला गया टेक्स्ट देखें",
-extractedHeading:"PDF से निकाला गया टेक्स्ट",
-limitsHeading:"महत्वपूर्ण जानकारी",
-empty:"पहले PDF फ़ाइल चुनें।",
-pdfOnly:"कृपया सही PDF फ़ाइल चुनें।",
-working:"PDF पढ़ी जा रही है और टेक्स्ट की जाँच हो रही है...",
-done:"जाँच पूरी हुई।",
-failed:"PDF नहीं पढ़ी जा सकी। फ़ाइल खराब, पासवर्ड-सुरक्षित या केवल इमेज वाली हो सकती है।",
-noText:"चुनने योग्य टेक्स्ट नहीं मिला। PDF स्कैन की हुई हो सकती है। OCR सुविधा शामिल नहीं है।",
-pages:"पेज",
-words:"निकाले गए शब्द",
-findings:"जाँचने योग्य संभावित बिंदु",
-none:"चेतावनी वाले खोज-शब्द नहीं मिले। इसका अर्थ यह नहीं कि एग्रीमेंट सुरक्षित है।",
-disclaimer:"यह केवल शुरुआती शब्द-आधारित जाँच है। यह कानूनी सलाह, धोखाधड़ी की पुष्टि या अंतिम जोखिम आकलन नहीं है।",
-downloadReady:"टेक्स्ट रिपोर्ट डाउनलोड हो गई।",
-show:"निकाला गया टेक्स्ट देखें",
-hide:"टेक्स्ट छिपाएँ",
-limits:[
-"यह टूल सामान्य शब्दों की जाँच करता है, कानूनी समीक्षा या धोखाधड़ी की अंतिम पुष्टि नहीं।",
-"यह पुष्टि नहीं कर सकता कि ऋणदाता या एग्रीमेंट असली है या नहीं।",
-"स्कैन की हुई PDF में टेक्स्ट नहीं मिल सकता; OCR शामिल नहीं है।",
-"ऋणदाता, ब्याज दर, शुल्क, जुर्माना और भुगतान की शर्तें स्वतंत्र रूप से जाँचें।"
-],
-checks:[
-["ब्याज दर या APR","high interest|very high interest|excessive interest|annual percentage rate|APR"],
-["देरी शुल्क या जुर्माना","late fee|late payment|penalty|penalties|default charge"],
-["पहले भुगतान या फोरक्लोज़र शुल्क","prepayment charge|prepayment penalty|foreclosure charge|early repayment fee"],
-["गिरवी या सुरक्षा","collateral|security interest|secured loan|pledge|hypothecation"],
-["बदलती ब्याज दर","floating interest|variable interest|rate may change|change in interest rate"],
-["ऑटो-डेबिट या बैंक मैंडेट","automatic debit|auto debit|direct debit|bank mandate|NACH mandate"],
-["विवाद या मध्यस्थता की शर्तें","arbitration|dispute resolution|jurisdiction|governing law"],
-["डिफॉल्ट की शर्तें","event of default|acceleration clause|entire balance due|default interest"],
-["अतिरिक्त शुल्क","processing fee|administrative fee|hidden charges|additional charges"],
-["व्यक्तिगत गारंटी","personal guarantee|personal guarantor|guarantor liability"]
-]
+hi:{
+heroTitle:"लोन लेने से पहले अपनी सुरक्षा करें",
+heroText:"लोन ऑफर जाँचें, चेतावनी के संकेत पहचानें और अनुमानित भुगतान समझें।",
+manualTitle:"🔎 लोन ऑफर की जाँच करें",lenderLabel:"बैंक / ऋणदाता का नाम",
+offerLabel:"लोन ऑफर का विवरण",checkBtn:"लोन सुरक्षा जाँचें",
+pdfTitle:"📄 लोन एग्रीमेंट PDF अपलोड करें",
+pdfHelp:"टेक्स्ट वाली PDF आपके ब्राउज़र में प्रोसेस होती है। PDF हमारे सर्वर पर नहीं भेजी जाती।",
+analyzeBtn:"PDF निकालें और जाँचें",detailsTitle:"निकाली गई जानकारी",
+amountLabel:"लोन राशि",rateLabel:"वार्षिक ब्याज",emiLabel:"मासिक EMI",
+tenureLabel:"अवधि",previewTitle:"निकाले गए टेक्स्ट का पूर्वावलोकन",
+costTitle:"🧮 लोन भुगतान का अनुमान",costHelp:"ऋणदाता की आधिकारिक भुगतान तालिका के आँकड़े भरें।",
+principalLabel:"मूल लोन राशि (₹)",interestLabel:"वार्षिक ब्याज दर (%)",
+monthsLabel:"अवधि (महीने)",calculateBtn:"अनुमानित लागत निकालें",
+disclaimerTitle:"⚠️ वित्तीय और कानूनी अस्वीकरण",
+disclaimerHeading:"महत्वपूर्ण सूचना",
+disclaimerText:"LoanShield AI केवल जानकारी और शिक्षा के उद्देश्य से प्रारंभिक स्वचालित जाँच करता है। जोखिम स्कोर, निकाली गई जानकारी और भुगतान के अनुमान अधूरे या गलत हो सकते हैं। यह टूल वित्तीय या कानूनी सलाह नहीं देता और किसी ऋणदाता या ऋण समझौते की सुरक्षा, प्रामाणिकता या कानूनी वैधता की गारंटी नहीं देता।",
+advisorText:"किसी ऋण समझौते पर हस्ताक्षर करने या वित्तीय निर्णय लेने से पहले कृपया योग्य वित्तीय या कानूनी सलाहकार से परामर्श करें।",
+verifyText:"ऋणदाता, ब्याज दर, शुल्क, जुर्माने और भुगतान की शर्तों की स्वतंत्र रूप से पुष्टि करें। मूल समझौते और आधिकारिक भुगतान तालिका को अवश्य जाँचें।",
+privacyText:"गोपनीयता: PDF का टेक्स्ट आपके ब्राउज़र में प्रोसेस होता है। PDF.js लाइब्रेरी तीसरे पक्ष के CDN से लोड होती है। यह टूल आपकी PDF LoanShield सर्वर पर अपलोड नहीं करता।",
+reportTitle:"📋 आपकी रिपोर्ट",downloadBtn:"रिपोर्ट डाउनलोड करें (.txt)",
+shareBtn:"WhatsApp पर सारांश साझा करें",reportHelp:"निकाली गई जानकारी पर भरोसा करने से पहले मूल लोन दस्तावेज़ से मिलान करें।",
+needPDF:"पहले PDF फ़ाइल चुनें।",reading:"PDF को ब्राउज़र में पढ़ा जा रहा है…",
+readDone:"PDF टेक्स्ट निकाल लिया गया है। मूल समझौते से ध्यानपूर्वक मिलान करें।",
+pdfError:"PDF नहीं पढ़ी जा सकी। सही और बिना पासवर्ड वाली टेक्स्ट PDF आज़माएँ।",
+scanned:"चयन योग्य टेक्स्ट नहीं मिला। यह स्कैन की गई PDF हो सकती है; इस संस्करण में OCR शामिल नहीं है।",
+notFound:"नहीं मिला",riskTitle:"प्रारंभिक चेतावनी स्कोर",
+costEstimate:"अनुमानित भुगतान",totalPaid:"कुल अनुमानित भुगतान",
+interestPaid:"अनुमानित ब्याज",riskNote:"यह स्कोर चेतावनी से जुड़े शब्दों की गिनती करता है। यह धोखाधड़ी की संभावना नहीं है और सुरक्षा प्रमाणित नहीं करता।",
+manualWarn:"चेतावनी के संकेत मिले। ऋणदाता और सभी शर्तों की स्वतंत्र रूप से जाँच करें।",
+manualOk:"चुने गए चेतावनी संकेत नहीं बताए गए। इससे लोन सुरक्षित साबित नहीं होता।",
+advanceWarn:"अग्रिम भुगतान की माँग से जुड़ा संकेत मिला। ऋणदाता और माँग की स्वतंत्र पुष्टि किए बिना भुगतान न करें।",
+noAdvance:"इस सामान्य जाँच में अग्रिम भुगतान से जुड़े शब्द नहीं मिले। इससे सुरक्षा साबित नहीं होती।",
+consult:"निर्णय लेने से पहले योग्य वित्तीय या कानूनी सलाहकार से परामर्श करें।",
+badInput:"कृपया सही मूल राशि, ब्याज दर और अवधि दर्ज करें।",
+amount:"लोन राशि",rate:"ब्याज दर",emi:"EMI",months:"महीने",
+flagFee:"अस्पष्ट या छिपे शुल्क",flagAdvance:"अग्रिम भुगतान की माँग",
+flagUrgency:"जल्दी करने का दबाव",flagGuarantee:"गारंटीड मंज़ूरी का दावा",
+flagPenalty:"देर से भुगतान या डिफॉल्ट शुल्क",flagVariable:"बदलती ब्याज दर",
+flagSensitive:"संवेदनशील जानकारी की माँग",flagOther:"अन्य संदिग्ध शब्द",
+principal:"मूल राशि",rateShort:"वार्षिक दर",tenure:"अवधि",
+costCaveat:"यह गणितीय अनुमान है, ऋणदाता का आधिकारिक प्रस्ताव नहीं। वास्तविक शुल्क, कर, बीमा और अन्य लागतें कुल राशि बदल सकती हैं।"
 }
 };
 
-let currentLang = "en";
-let reportText = "";
-let extracted = "";
-
-function setLanguage() {
-  currentLang = document.getElementById("language").value;
-  const t = TX[currentLang];
-  document.documentElement.lang = currentLang;
-  [
-    "subtitle","languageLabel","uploadHeading","intro","fileLabel",
-    "analyzeBtn","clearBtn","resultsHeading","downloadBtn",
-    "extractedHeading","limitsHeading"
-  ].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && t[id]) el.textContent = t[id];
-  });
-  document.getElementById("privacyNotice").innerHTML = t.privacyNotice;
-  document.getElementById("textBtn").textContent = t.textBtn;
-  document.getElementById("limits").innerHTML =
-    t.limits.map(x => "<li>" + escapeHtml(x) + "</li>").join("");
-  document.getElementById("status").textContent = "";
+let lang="en",pdfTextContent="",lastReport="",lastCost="";
+function tr(k){return (T[lang]&&T[lang][k])||T.en[k]||k}
+function setLanguage(v){
+lang=v==="hi"?"hi":"en";
+document.documentElement.lang=lang;
+Object.keys(T[lang]).forEach(k=>{
+const el=document.getElementById(k);
+if(el&&el.tagName!=="INPUT"&&el.tagName!=="TEXTAREA"&&el.tagName!=="SELECT")el.textContent=T[lang][k];
+});
+document.getElementById("language").value=lang;
+if(pdfTextContent)renderPDFAnalysis(pdfTextContent);
 }
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+function money(n){return Number.isFinite(n)?n.toLocaleString("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}):tr("notFound")}
+function clean(n){return String(n).replace(/[<>]/g,"")}
+function checkOffer(){
+const offer=document.getElementById("offer").value;
+const fee=document.getElementById("fees").value;
+const verified=document.getElementById("verified").value;
+const advance=document.getElementById("advance").value;
+let score=0,flags=[];
+if(fee==="no"){score+=20;flags.push(tr("flagFee"))}
+if(verified==="no"){score+=25;flags.push("Lender could not be verified")}
+if(advance==="yes"){score+=30;flags.push(tr("flagAdvance"))}
+const checks=[
+[/advance fee|upfront fee|pay.*before.*loan|processing.*payment|advance payment|security deposit/i,25,"flagAdvance"],
+[/urgent|act now|limited time|immediately|within minutes|आज ही|तुरंत|जल्दी/i,15,"flagUrgency"],
+[/guaranteed approval|100% approval|no rejection|guaranteed loan/i,15,"flagGuarantee"],
+[/late fee|penalty|default charge|overdue charge/i,5,"flagPenalty"],
+[/variable rate|floating rate|rate may change/i,5,"flagVariable"],
+[/otp|password|pin number|share.*bank details|remote access/i,25,"flagSensitive"]
+];
+checks.forEach(([re,points,key])=>{if(re.test(offer)){score+=points;flags.push(tr(key))}});
+score=Math.min(100,score);
+const box=document.getElementById("manualResult");
+box.innerHTML=`<div class="notice"><h3>${tr("riskTitle")}: ${score}/100</h3><p>${score>=40?tr("manualWarn"):tr("manualOk")}</p><p>${flags.length?flags.map(clean).join(" · "):tr("noAdvance")}</p><p>${tr("riskNote")}</p><p><strong>${tr("consult")}</strong></p></div>`;
+lastReport="LoanShield AI — Preliminary Loan Review\nLender: "+(document.getElementById("lender").value||"Not supplied")+"\nWarning score: "+score+"/100\nFindings: "+(flags.join(", ")||"No selected warning wording detected")+"\n"+tr("riskNote")+"\n"+tr("advisorText");
 }
-
-function countWords(text) {
-  const matches = text.trim().match(/\S+/g);
-  return matches ? matches.length : 0;
+function clearForm(){
+["lender","offer"].forEach(id=>document.getElementById(id).value="");
+["fees","verified","advance"].forEach(id=>document.getElementById(id).selectedIndex=0);
+document.getElementById("manualResult").innerHTML="";
 }
-
-async function analyzeLoanPDF() {
-  const t = TX[currentLang];
-  const file = document.getElementById("loanPdf").files[0];
-  const status = document.getElementById("status");
-  const btn = document.getElementById("analyzeBtn");
-  document.getElementById("resultsCard").classList.add("hidden");
-  document.getElementById("extractedWrap").classList.add("hidden");
-
-  if (!file) {
-    status.textContent = t.empty;
-    return;
-  }
-  if (!file.name.toLowerCase().endsWith(".pdf") &&
-      file.type !== "application/pdf") {
-    status.textContent = t.pdfOnly;
-    return;
-  }
-  if (!window.pdfjsLib) {
-    status.textContent = "PDF.js could not load. Check your internet connection and refresh the page.";
-    return;
-  }
-
-  btn.disabled = true;
-  status.textContent = t.working;
-
-  try {
-    const buffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({data: buffer}).promise;
-    const pageTexts = [];
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      status.textContent = t.working + " (" + i + "/" + pdf.numPages + ")";
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const line = content.items.map(item => item.str).join(" ");
-      pageTexts.push("---- Page " + i + " ----\n" + line);
-    }
-
-    extracted = pageTexts.join("\n\n").trim();
-    if (!extracted.replace(/---- Page \d+ ----/g, "").trim()) {
-      throw new Error("NO_TEXT");
-    }
-
-    const findings = [];
-    const searchable = extracted.toLowerCase();
-
-    for (const [name, terms] of t.checks) {
-      const matches = terms.split("|").filter(term =>
-        searchable.includes(term.toLowerCase())
-      );
-      if (matches.length) {
-        findings.push({name, matches});
-      }
-    }
-
-    let html = "";
-    html += '<div class="result good"><strong>' +
-      escapeHtml(t.pages) + ":</strong> " + pdf.numPages +
-      " &nbsp; <strong>" + escapeHtml(t.words) + ":</strong> " +
-      countWords(extracted) + "</div>";
-
-    html += '<h3>' + escapeHtml(t.findings) + "</h3>";
-
-    if (!findings.length) {
-      html += '<div class="result good">' + escapeHtml(t.none) + "</div>";
-    } else {
-      findings.forEach(item => {
-        html += '<div class="result warning"><strong>' +
-          escapeHtml(item.name) + "</strong><br>" +
-          "Matched terms: " +
-          item.matches.map(escapeHtml).join(", ") +
-          "<br>Review the relevant clause in the original agreement.</div>";
-      });
-    }
-
-    html += '<div class="result danger">' +
-      escapeHtml(t.disclaimer) + "</div>";
-
-    document.getElementById("summary").innerHTML =
-      '<p><strong>' + escapeHtml(file.name) + "</strong></p>";
-    document.getElementById("findings").innerHTML = html;
-    document.getElementById("extractedText").value = extracted;
-    document.getElementById("resultsCard").classList.remove("hidden");
-
-    reportText =
-      "LoanShield AI - Preliminary PDF Text Check\n" +
-      "File: " + file.name + "\n" +
-      "Pages: " + pdf.numPages + "\n" +
-      "Words: " + countWords(extracted) + "\n\n" +
-      t.disclaimer + "\n\n" +
-      "Findings:\n" +
-      (findings.length
-        ? findings.map(f => f.name + ": " + f.matches.join(", ")).join("\n")
-        : t.none) +
-      "\n\nEXTRACTED TEXT\n\n" + extracted;
-
-    status.textContent = t.done;
-    document.getElementById("resultsCard").scrollIntoView({behavior:"smooth"});
-  } catch (err) {
-    console.error(err);
-    status.textContent = err.message === "NO_TEXT" ? t.noText : t.failed;
-  } finally {
-    btn.disabled = false;
-  }
+async function analyzePDF(){
+const file=document.getElementById("pdfFile").files[0];
+const status=document.getElementById("pdfStatus");
+if(!file){status.textContent=tr("needPDF");return}
+if(!file.name.toLowerCase().endsWith(".pdf")){status.textContent=tr("pdfError");return}
+if(!window.pdfjsLib){status.textContent="PDF library failed to load. Check your internet connection and refresh.";return}
+status.textContent=tr("reading");
+try{
+const data=await file.arrayBuffer();
+const pdf=await pdfjsLib.getDocument({data}).promise;
+let text="";
+for(let p=1;p<=pdf.numPages;p++){
+const page=await pdf.getPage(p);
+const content=await page.getTextContent();
+text+="\n"+content.items.map(i=>i.str).join(" ");
 }
-
-function toggleExtracted() {
-  const wrap = document.getElementById("extractedWrap");
-  const t = TX[currentLang];
-  wrap.classList.toggle("hidden");
-  document.getElementById("textBtn").textContent =
-    wrap.classList.contains("hidden") ? t.show : t.hide;
+pdfTextContent=text.trim();
+document.getElementById("pdfResults").style.display="block";
+document.getElementById("pdfText").textContent=pdfTextContent.slice(0,12000)||tr("scanned");
+renderPDFAnalysis(pdfTextContent);
+status.textContent=pdfTextContent?tr("readDone"):tr("scanned");
+}catch(e){console.error(e);status.textContent=tr("pdfError")}
 }
-
-function downloadReport() {
-  if (!reportText) return;
-  const blob = new Blob([reportText], {type:"text/plain;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "LoanShield_Report.txt";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+function extractNumber(text,regex){
+const m=text.match(regex);
+if(!m)return null;
+const n=Number(String(m[1]).replace(/,/g,""));
+return Number.isFinite(n)?n:null;
 }
-
-function clearResults() {
-  document.getElementById("loanPdf").value = "";
-  document.getElementById("status").textContent = "";
-  document.getElementById("resultsCard").classList.add("hidden");
-  document.getElementById("extractedWrap").classList.add("hidden");
-  document.getElementById("summary").innerHTML = "";
-  document.getElementById("findings").innerHTML = "";
-  document.getElementById("extractedText").value = "";
-  reportText = "";
-  extracted = "";
+function renderPDFAnalysis(text){
+const not=tr("notFound");
+const amount=extractNumber(text,/(?:loan amount|principal amount|amount financed|loan principal|sanctioned amount|लोन राशि|ऋण राशि)[^\d₹]{0,35}(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d+)?)/i);
+const rate=extractNumber(text,/(?:annual interest(?: rate)?|interest rate|rate of interest|p\.?a\.?|ब्याज दर)[^\d%]{0,25}([\d.]+)\s*%/i);
+let emi=extractNumber(text,/(?:monthly emi|emi amount|monthly instalment|monthly installment|मासिक ईएमआई)[^\d₹]{0,25}(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d+)?)/i);
+const years=extractNumber(text,/(?:tenure|loan term|repayment period|अवधि)[^\d]{0,25}([\d.]+)\s*(years?|yrs?)/i);
+let months=extractNumber(text,/(?:tenure|loan term|repayment period|अवधि)[^\d]{0,25}([\d.]+)\s*(months?|mos?)/i);
+if(!months&&years)months=years*12;
+document.getElementById("amountValue").textContent=amount?money(amount):not;
+document.getElementById("rateValue").textContent=rate!==null?rate+"%":not;
+document.getElementById("tenureValue").textContent=months?months+" "+tr("months"):not;
+if(!emi&&amount&&rate!==null&&months){
+const r=rate/1200;
+emi=r===0?amount/months:amount*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1);
 }
-
-setLanguage();
+document.getElementById("emiValue").textContent=emi?money(emi):not;
+const rules=[
+[/advance fee|upfront fee|pay.*before.*loan|advance payment|security deposit|पहले.*शुल्क/i,25,"flagAdvance"],
+[/urgent|act now|limited time|immediately|within minutes|तुरंत|जल्दी/i,15,"flagUrgency"],
+[/guaranteed approval|100% approval|no rejection/i,15,"flagGuarantee"],
+[/late fee|penalty|default charge|overdue charge/i,5,"flagPenalty"],
+[/variable rate|floating rate|rate may change/i,5,"flagVariable"],
+[/otp|password|pin number|share.*bank details|remote access/i,25,"flagSensitive"],
+[/hidden fee|undisclosed fee|additional charges|processing fee/i,10,"flagFee"]
+];
+let score=0,flags=[];
+rules.forEach(([re,pts,key])=>{if(re.test(text)){score+=pts;flags.push(tr(key))}});
+score=Math.min(score,100);
+let cost="";
+if(amount&&months&&emi){
+const total=emi*months;
+cost=`<div class="tile"><h3>${tr("costEstimate")}</h3><p>${tr("emi")}: <strong>${money(emi)}</strong></p><p>${tr("totalPaid")}: <strong>${money(total)}</strong></p><p>${tr("interestPaid")}: <strong>${money(total-amount)}</strong></p><p class="small">${tr("costCaveat")}</p></div>`;
+}
+const advanced=amount&&rate!==null&&months?`<button class="secondary" onclick="fillCalculator(${amount},${rate},${months})">Use extracted figures in calculator</button>`:"";
+document.getElementById("enhancedReview").innerHTML=`
+<div class="notice"><h3>${tr("riskTitle")}: ${score}/100</h3>
+<p>${flags.length?flags.map(clean).join(" · "):tr("noAdvance")}</p>
+<p>${tr("riskNote")}</p></div>${cost}${advanced}
+<div class="tile"><strong>${tr("advisorText")}</strong><p>${tr("verifyText")}</p></div>`;
+lastReport="LoanShield AI — Preliminary PDF Review\nFile: "+(document.getElementById("pdfFile").files[0]?.name||"PDF")+"\n"+tr("amount")+": "+(amount?money(amount):not)+"\n"+tr("rate")+": "+(rate!==null?rate+"%":not)+"\n"+tr("emi")+": "+(emi?money(emi):not)+"\n"+tr("tenure")+": "+(months?months+" "+tr("months"):not)+"\n"+tr("riskTitle")+": "+score+"/100\nFindings: "+(flags.join(", ")||tr("noAdvance"))+"\n"+(amount&&months&&emi?tr("totalPaid")+": "+money(emi*months)+"\n"+tr("interestPaid")+": "+money(emi*months-amount):"")+"\n"+tr("riskNote")+"\n"+tr("advisorText")+"\n"+tr("verifyText");
+}
+function fillCalculator(p,r,m){
+document.getElementById("principal").value=p;
+document.getElementById("interest").value=r;
+document.getElementById("months").value=m;
+calculateLoan();
+document.getElementById("costTitle").scrollIntoView({behavior:"smooth"});
+}
+function calculateLoan(){
+const p=Number(document.getElementById("principal").value);
+const annual=Number(document.getElementById("interest").value);
+const n=Number(document.getElementById("months").value);
+const out=document.getElementById("costResult");
+if(!(p>0)||annual<0||annual>100||!(n>0)||n>600){out.innerHTML=`<p class="bad">${tr("badInput")}</p>`;return}
+const r=annual/1200;
+const emi=r===0?p/n:p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+const total=emi*n,interest=total-p;
+out.innerHTML=`<div class="grid"><div class="tile"><div>${tr("emi")}</div><div class="big">${money(emi)}</div></div><div class="tile"><div>${tr("totalPaid")}</div><div class="big">${money(total)}</div></div><div class="tile"><div>${tr("interestPaid")}</div><div class="big">${money(interest)}</div></div></div><p class="small">${tr("costCaveat")}</p><p><strong>${tr("advisorText")}</strong></p>`;
+lastCost=`\nManual loan estimate\nPrincipal: ${money(p)}\nAnnual rate: ${annual}%\nTenure: ${n} months\nEstimated EMI: ${money(emi)}\nEstimated total repayment: ${money(total)}\nEstimated interest: ${money(interest)}\n${tr("costCaveat")}`;
+lastReport+=lastCost;
+}
+function downloadReport(){
+const content=(lastReport||"LoanShield AI — Preliminary Loan Review\nNo review has been completed yet.")+"\n\nDISCLAIMER\n"+tr("disclaimerText")+"\n"+tr("advisorText")+"\n"+tr("verifyText")+"\n\n"+tr("riskNote");
+const blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+a.href=url;a.download="LoanShield_AI_Report.txt";
+document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+function shareWhatsApp(){
+const msg=(lastReport||"LoanShield AI preliminary loan review")+"\n\n"+tr("disclaimerText")+"\n"+tr("advisorText");
+window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank","noopener,noreferrer");
+}
+document.getElementById("year").textContent=new Date().getFullYear();
+setLanguage("en");
 </script>
 </body>
 </html>
